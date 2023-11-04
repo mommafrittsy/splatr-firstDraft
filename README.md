@@ -1,4 +1,4 @@
-# splatr
+# splatr - first draft
 The original first draft of Splatr from early 2019. This project was my first, end-to-end, build of a web-app with a database backend and a full frontend. Splatr was a platform for artists to list their commission offerings and for fans to support their favorite artists. Operating on with a node.js/Express server, MongoDB database, and a VanillaJS front-end, Splatr handled the full lifecycle of the artist commission process.
 
 ## Stack
