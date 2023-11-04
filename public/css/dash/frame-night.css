@@ -1,0 +1,41 @@
+.block {
+  background-color: #1c1721;
+  color: white;
+}
+.block a, .block.card a {
+  color: white !important;
+}
+.block .form-control {
+  background: transparent;
+  color: white;
+}
+nav {
+  background: #42364c;
+  background: linear-gradient(to bottom, #42364c 0%,#371f60 85%);
+}
+nav > .dash-link:hover , nav > .dash-link.active{
+  background-color: #1c1721;
+  color: #fff;
+}
+nav > .dash-link:hover + .dash-link-label, nav > .dash-link.active + .dash-link-label {
+  background-color: #1c1721;
+  color: #fff;
+}
+nav > #home-img {
+  background-image: url('https://ayizan.blob.core.windows.net/ayizanlogos/Logos/Splatr stacked white-text.svg');
+}
+#settings textarea, #tags-input, .social-input {
+  background:transparent;
+  color: white;
+}
+.table.table-stripped a {
+  color: white;
+}
+.verify {
+  color: white;
+}
+@media (min-width:800px){
+  nav:hover > #home-img {
+    background-image: url('https://ayizan.blob.core.windows.net/ayizanlogos/Logos/Splatr purple white text.svg');
+  }
+}

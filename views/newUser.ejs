@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>Welcome to Splatr. | Splatr. Make More, Share More.</title>
+  <link rel="icon" href="https://ayizan.blob.core.windows.net/site-images/Splatr Icon.png" type="image/png">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+  <link rel="stylesheet" href="/now/sass/now-ui-kit.css">
+  <link rel="stylesheet" href="/css/flag-icon.min.css" type="text/css">
+  <link rel="stylesheet" href="/css/main.css" type="text/css">
+  <link rel="stylesheet" href="/css/newUser.css" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Assistant|Archivo+Black" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.3.5/cropper.min.css">
+  <script src='/js/all.min.js' type="text/javascript"></script>
+</head>
+<body>
+  <div class="row justify-content-center align-items-center" id="body-container">
+    <% if(error && error.length > 0){ %>
+    <div class="col-12">
+      <div class="container my-3">
+        <div class="alert alert-danger alert-dismissible fade show p-3" role="alert">
+          <div class="container">
+            <div class="alert-icon">
+              <i class="now-ui-icons objects_support-17"></i>
+            </div>
+            <strong class="mr-3">Oh no!</strong> <%=error%>
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+              <span aria-hidden="true">
+                <i class="far fa-times text-white"></i>
+              </span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <% } %>
+    <div class="col-12 col-md-8 col-xl-6">
+      <div class="card">
+        <div class="card-header">
+          <div class="row justify-content-center">
+            <div class="col-10 col-sm-6 col-md-4 col-xl-3">
+              <img class="img-fluid" src="https://ayizan.blob.core.windows.net/ayizanlogos/Logos/Splatr Purple.svg">
+            </div>
+          </div>
+        </div>
+        <div class="card-body text-center">
+          <div id="slide-1">
+            <h1>Welcome to Splatr.</h1>
+            <p class="h4">We hope you like it here!</p>
+            <p>Before you go too far, we'd like to get to know a little bit about you.</p>
+            <button type="button" class="btn btn-primary btn-lg" id="start-btn">Dive In</button>
+          </div>
+          <div class="inactive" id="slide-2">
+            <h1 class="h4">First off...Where are you from?</h1>
+            <div class="row justify-content-center">
+              <div class="col-10">
+                <label class="sr-only" for="user-country">Which country are you from?</label>
+                <div class="input-group pl-xl-4">
+                  <div class="input-group-addon" id="flag-span">
+                    <span class="flag-icon" id="flag-icon"></span>
+                  </div>
+                  <select class="custom-select" id="user-country" name="userCountry" autocomplete="off">
+                    <option value="" selected></option>
+                    <% let keys = Object.keys(countries);%>
+                    <% for(let key of keys){ %>
+                    <option value="<%=key%>"><%=countries[key]%></option>
+                    <% } %>
+                  </select>
+                </div>
+              </div>
+            </div>
+            <p class="inactive text-primary" id="artist-accept">You can be an artist on Splatr!</p>
+            <button type="button" class="inactive btn btn-primary btn-lg slide-change" data-slide="3" id="artist-button">Onward!</button>
+            <button type="button" class="inactive btn btn-primary btn-lg slide-change" data-slide="9" id="non-artist-button">Let's Support Some Artists!</button>
+            <p><small>Due to US regulations, we can only offer certain services to people from certain locations. Call your Senators, kids.</small></p>
+          </div>
+          <div class="inactive" id="slide-3">
+            <h1>Do You...</h1>
+            <div class="row align-items-center">
+              <div class="col-3">
+                <button type="button" class="btn btn-neutral slide-change" data-slide="2">
+                  <i class="fas fa-angle-left fa-5x text-primary"></i>
+                </button>
+              </div>
+              <div class="col-9">
+                <div class="row justify-content-center">
+                  <div class="col-12 col-xl-5 userType mb-3 slide-change" data-slide="4">
+                    <i class="far fa-paint-brush-alt fa-5x"></i>
+                    <h2 class="h4 mb-0">Make Art?</h2>
+                  </div>
+                  <div class="col-md-1 d-none d-md-inline"></div>
+                  <div class="col-12 col-xl-5 userType slide-change mb-3" data-slide="9">
+                    <i class="far fa-hand-holding-heart fa-5x"></i>
+                    <h2 class="h4 mb-0">Buy Art?</h2>
+                  </div>
+                  <div class="col-12 mt-3">
+                    <p>Don't worry, you can change this later via your Dash.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <form action="/dash/user/new/artist" method="POST" id="artist-form">
+            <div class="inactive" id="slide-4">
+              <h1>Personal Information</h1>
+              <p>For security purposes, in order to get you paid, we need your full name, birth date and mailing address. You can change all but your birth date as you need later.</p>
+              <div class="row align-items-center">
+                <div class="col-2">
+                  <button type="button" class="btn btn-neutral slide-change" data-slide="3">
+                    <i class="fas fa-angle-left fa-5x text-primary"></i>
+                  </button>
+                </div>
+                <div class="col-8">
+                  <div class="form-row">
+                    <div class="form-group col-md-6">
+                      <label for="firstName" class="col-form-label">Given Name <span class="text-danger">*</span></label>
+                      <input type="text" class="form-control" id="firstName" name="firstName" required>
+                    </div>
+                    <div class="form-group col-md-6">
+                      <label for="lastName" class="col-form-label">Surname <span class="text-danger">*</span></label>
+                      <input type="text" class="form-control" id="lastName" name="lastName" required>
+                    </div>
+                  </div>
+                  <div class="form-row">
+                    <div class="form-group col-md-6">
+                      <label for="ourName" class="col-form-label">Preferred Name</label>
+                      <input type="text" class="form-control" id="prefName" name="prefName">
+                    </div>
+                    <div class="form-group col-md-6">
+                      <label for="birthday" class="col-form-label">Birth Date <span class="text-danger">*</span></label>
+                      <input type="date" class="form-control" id="birthday" name="birthday" required>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-2">
+                  <button type="button" class="btn btn-neutral slide-change" data-slide="5">
+                    <i class="fas fa-angle-right fa-5x text-primary"></i>
+                  </button>
+                </div>
+              </div>
+              <p class="mt-3">
+                <button type="button" class="bubble-button slide-change" data-slide="3"><i class="far fa-circle text-primary"></i></button>
+                <span><i class="fas fa-circle text-primary"></i></span>
+                <button type="button" class="bubble-button slide-change" data-slide="5"><i class="far fa-circle text-primary"></i></button>
+                <button type="button" class="bubble-button slide-change" data-slide="6"><i class="far fa-circle text-primary"></i></button>
+              </p>
+            </div>
+            <div class="inactive" id="slide-5">
+              <h1>Address Information</h1>
+              <div class="row align-items-center">
+                <div class="col-2">
+                  <button type="button" class="btn btn-neutral slide-change" data-slide="4">
+                    <i class="fas fa-angle-left fa-5x text-primary"></i>
+                  </button>
+                </div>
+                <div class="col-8">
+                  <div class="form-group">
+                    <label for="street" class="col-form-label">Street Address</label>
+                    <input type="text" class="form-control" id="street" name="street">
+                  </div>
+                  <div class="form-group">
+                    <label for="suite" class="col-form-label">Apartment/Suite</label>
+                    <input type="text" class="form-control" id="suite" name="suite">
+                  </div>
+                  <div id="no-state-group">
+                    <div class="form-row">
+                      <div class="form-group col-md-6">
+                        <label for="city" class="col-form-label">City</label>
+                        <input type="text" class="form-control" id="city" name="noStateCity">
+                      </div>
+                      <div class="form-group col-md-6">
+                        <label for="post" class="col-form-label">Postcode</label>
+                        <input type="text" class="form-control" id="post" name="noStatePost">
+                      </div>
+                    </div>
+                  </div>
+                  <div class="inactive" id="state-group">
+                    <div class="form-row">
+                      <div class="form-group col-md-5">
+                        <label for="city" class="col-form-label">City</label>
+                        <input type="text" class="form-control" id="city-state" name="stateCity">
+                      </div>
+                      <div class="form-group col-md-4">
+                        <label for="state" class="col-form-label">State</label>
+                        <select class="custom-select inactive states" id="australia-states" name="auState">
+                          <option value="ACT">Australian Capital Territory</option>
+                          <option value="NSW">New South Wales</option>
+                          <option value="NT ">Northern Territory</option>
+                          <option value="QLD">Queensland</option>
+                          <option value="SA ">South Australia</option>
+                          <option value="TAS">Tasmania</option>
+                          <option value="VIC">Victoria</option>
+                          <option value="WA ">Western Australia</option>
+                        </select>
+                        <select class="custom-select inactive states" id="canada-states" name="caState">
+                        	<option value="AB">Alberta</option>
+                        	<option value="BC">British Columbia (Colombie-Britannique)</option>
+                        	<option value="MB">Manitoba</option>
+                        	<option value="NB">New Brunswick (Nouveau-Brunswick)</option>
+                        	<option value="NL">Newfoundland and Labrador (Terre-Neuve-et-Labrador)</option>
+                        	<option value="NS">Nova Scotia (Nouvelle-Écosse)</option>
+                        	<option value="ON">Ontario</option>
+                        	<option value="PE">Prince Edward Island (Île-du-Prince-Édouard)</option>
+                        	<option value="QC">Quebec (Québec)</option>
+                        	<option value="SK">Saskatchewan</option>
+                        	<option value="NT">Northwest Territories (Territoires du Nord-Ouest)</option>
+                        	<option value="NU">Nunavut</option>
+                        	<option value="YT">Yukon</option>
+                        </select>
+                        <select class="custom-select inactive states" id="us-states" name="usState">
+                          <option value="AL">Alabama</option>
+                          <option value="AK">Alaska</option>
+                          <option value="AZ">Arizona</option>
+                          <option value="AR">Arkansas</option>
+                          <option value="CA">California</option>
+                          <option value="CO">Colorado</option>
+                          <option value="CT">Connecticut</option>
+                          <option value="DE">Delaware</option>
+                          <option value="DC">District Of Columbia</option>
+                          <option value="FL">Florida</option>
+                          <option value="GA">Georgia</option>
+                          <option value="HI">Hawaii</option>
+                          <option value="ID">Idaho</option>
+                          <option value="IL">Illinois</option>
+                          <option value="IN">Indiana</option>
+                          <option value="IA">Iowa</option>
+                          <option value="KS">Kansas</option>
+                          <option value="KY">Kentucky</option>
+                          <option value="LA">Louisiana</option>
+                          <option value="ME">Maine</option>
+                          <option value="MD">Maryland</option>
+                          <option value="MA">Massachusetts</option>
+                          <option value="MI">Michigan</option>
+                          <option value="MN">Minnesota</option>
+                          <option value="MS">Mississippi</option>
+                          <option value="MO">Missouri</option>
+                          <option value="MT">Montana</option>
+                          <option value="NE">Nebraska</option>
+                          <option value="NV">Nevada</option>
+                          <option value="NH">New Hampshire</option>
+                          <option value="NJ">New Jersey</option>
+                          <option value="NM">New Mexico</option>
+                          <option value="NY">New York</option>
+                          <option value="NC">North Carolina</option>
+                          <option value="ND">North Dakota</option>
+                          <option value="OH">Ohio</option>
+                          <option value="OK">Oklahoma</option>
+                          <option value="OR">Oregon</option>
+                          <option value="PA">Pennsylvania</option>
+                          <option value="RI">Rhode Island</option>
+                          <option value="SC">South Carolina</option>
+                          <option value="SD">South Dakota</option>
+                          <option value="TN">Tennessee</option>
+                          <option value="TX">Texas</option>
+                          <option value="UT">Utah</option>
+                          <option value="VT">Vermont</option>
+                          <option value="VA">Virginia</option>
+                          <option value="WA">Washington</option>
+                          <option value="WV">West Virginia</option>
+                          <option value="WI">Wisconsin</option>
+                          <option value="WY">Wyoming</option>
+                        </select>
+                      </div>
+                      <div class="form-group col-md-3">
+                        <label for="post" class="col-form-label">Postcode</label>
+                        <input type="text" class="form-control" id="post-state" name="statePost">
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-2">
+                  <button type="button" class="btn btn-neutral slide-change" data-slide="6" id="to-final-slide">
+                    <i class="fas fa-angle-right fa-5x text-primary"></i>
+                  </button>
+                </div>
+              </div>
+              <button type="button" class="bubble-button slide-change" data-slide="3"><i class="far fa-circle text-primary"></i></button>
+              <button type="button" class="bubble-button slide-change" data-slide="4"><i class="far fa-circle text-primary"></i></button>
+              <span><i class="fas fa-circle text-primary"></i></span>
+              <button type="button" class="bubble-button slide-change" data-slide="6"><i class="far fa-circle text-primary"></i></button>
+            </div>
+            <div class="inactive" id="slide-6">
+              <h1>So you are...</h1>
+              <div class="row">
+                <div class="col-2">
+                  <button type="button" class="btn btn-neutral slide-change" data-slide="5">
+                    <i class="fas fa-angle-left fa-5x text-primary"></i>
+                  </button>
+                </div>
+                <div class="col-8 inactive" id="all-info">
+                  <p class="h4"><span id="name"></span>.<br> An artist living in <span id="country"></span> at this address:</p>
+                  <address>
+                    <p id="street-name"></p>
+                    <p id="suite-name"></p>
+                    <p id="city-name"><span id="country-city"></span></p>
+                  </address>
+                  <p></p>
+                  <button type="submit" class="btn btn-primary" form="artist-form">That's right!</button>
+                  <p><small>By registering for an artist account, you agree to our <a href='/legal/tos' class="text-info">Terms of Service Agreement</a> and the <a href="https://stripe.com/us/connect-account/legal" class="text-info">Stripe Connected Account Agreement</a>.</small></p>
+                </div>
+                <div class="col-8 inactive" id="missing-info">
+                  <h1 class="h4">Oh dear...</h1>
+                  <p>It appears we're missing some required information. Double check and make sure that you have filled out all necessary fields.</p>
+                </div>
+              </div>
+              <button type="button" class="bubble-button slide-change" data-slide="3"><i class="far fa-circle text-primary"></i></button>
+              <button type="button" class="bubble-button slide-change" data-slide="4"><i class="far fa-circle text-primary"></i></button>
+              <button type="button" class="bubble-button slide-change" data-slide="5"><i class="far fa-circle text-primary"></i></button>
+              <span><i class="fas fa-circle text-primary"></i></span>
+            </div>
+            <input type="hidden" name="country" id="artist-country">
+          </form>
+          <div class="inactive" id="slide-9">
+            <h1>Welcome!</h1>
+            <div class="row align-items-center">
+              <div class="col-2 slide-change" data-slide="2">
+                <i class="fas fa-angle-left fa-5x text-primary"></i>
+              </div>
+              <div class="col-8">
+                <p>We're glad you're here!</p>
+                <p>
+                  There are no country restrictions for just buying art! We wish there weren't for making it, but such is life, we suppose. Anyway. We need your name and address to verify your payments and if you want to view NSFW content, we need your birthdate too.
+                </p>
+              </div>
+              <div class="col-2 slide-change" data-slide="10">
+                <i class="fas fa-angle-right fa-5x text-primary"></i>
+              </div>
+            </div>
+            <p class="mt-3">
+              <span><i class="fas fa-circle text-primary"></i></span>
+              <span class="slide-change" data-slide="10"><i class="far fa-circle text-primary"></i></span>
+              <span class="slide-change" data-slide="11"><i class="far fa-circle text-primary"></i></span>
+              <span class="slide-change" data-slide="12"><i class="far fa-circle text-primary"></i></span>
+            </p>
+          </div>
+          <form action="/dash/user/new/client" method="POST" id="client-form">
+            <div class="inactive" id="slide-10">
+              <h1>Personal Information</h1>
+              <div class="row align-items-center">
+                <div class="col-2 slide-change" data-slide="9">
+                  <i class="fas fa-angle-left fa-5x text-primary"></i>
+                </div>
+                <div class="col-8">
+                  <div class="form-row">
+                    <div class="form-group col-md-6">
+                      <label for="firstName" class="col-form-label">Given Name</label>
+                      <input type="text" class="form-control" id="firstName" name="firstName">
+                    </div>
+                    <div class="form-group col-md-6">
+                      <label for="lastName" class="col-form-label">Surname</label>
+                      <input type="text" class="form-control" id="lastName" name="lastName">
+                    </div>
+                  </div>
+                  <div class="form-row">
+                    <div class="form-group col-md-6">
+                      <label for="ourName" class="col-form-label">Preferred Name</label>
+                      <input type="text" class="form-control" id="prefName" name="prefName">
+                    </div>
+                    <div class="form-group col-md-6">
+                      <label for="birthday" class="col-form-label">Birth Date <small>(Needed to view NSFW content)</small></label>
+                      <input type="date" class="form-control" id="birthday" name="birthday">
+                    </div>
+                  </div>
+                </div>
+                <div class="col-2 slide-change" data-slide="11">
+                  <i class="fas fa-angle-right fa-5x text-primary"></i>
+                </div>
+              </div>
+              <p class="mt-3">
+                <span class="slide-change" data-slide="9"><i class="far fa-circle text-primary"></i></span>
+                <span><i class="fas fa-circle text-primary"></i></span>
+                <span class="slide-change" data-slide="11"><i class="far fa-circle text-primary"></i></span>
+                <span class="slide-change" data-slide="12"><i class="far fa-circle text-primary"></i></span>
+              </p>
+            </div>
+            <div class="inactive" id="slide-11">
+              <h1>Address</h1>
+              <div class="row align-items-center">
+                <div class="col-2 slide-change" data-slide="10">
+                  <i class="fas fa-angle-left fa-5x text-primary"></i>
+                </div>
+                <div class="col-8">
+                  <div class="form-group">
+                    <label for="street" class="col-form-label">Street Address</label>
+                    <input type="text" class="form-control" id="street" name="street">
+                  </div>
+                  <div class="form-group">
+                    <label for="suite" class="col-form-label">Apartment/Suite</label>
+                    <input type="text" class="form-control" id="suite" name="suite">
+                  </div>
+                  <div class="form-row">
+                    <div class="form-group col-md-6">
+                      <label for="city" class="col-form-label">City</label>
+                      <input type="text" class="form-control" id="city" name="city">
+                    </div>
+                    <div class="form-group col-md-6">
+                      <label for="post" class="col-form-label">Zip or Postcode</label>
+                      <input type="text" class="form-control" id="post" name="post">
+                    </div>
+                  </div>
+                </div>
+                <div class="col-2 slide-change" data-slide="12">
+                  <i class="fas fa-angle-right fa-5x text-primary"></i>
+                </div>
+              </div>
+              <p class="mt-3">
+                <span class="slide-change" data-slide="9"><i class="far fa-circle text-primary"></i></span>
+                <span class="slide-change" data-slide="10"><i class="far fa-circle text-primary"></i></span>
+                <span><i class="fas fa-circle text-primary"></i></span>
+                <span class="slide-change" data-slide="12"><i class="far fa-circle text-primary"></i></span>
+              </p>
+            </div>
+            <div class="inactive" id="slide-12">
+              <h1>All set!</h1>
+              <div class="row align-items-center">
+                <div class="col-2 slide-change" data-slide="11">
+                  <i class="fas fa-angle-left fa-5x text-primary"></i>
+                </div>
+                <div class="col-8">
+                  <p> You can make changes to everything here apart from your birthdate (contact us if you made a mistake on that one) in the Account ( <i class="fal fa-cog fa-lg"></i> ) section of your Dash.</p>
+                  <button type="submit" class="btn btn-primary">Got it!</button>
+                </div>
+              </div>
+              <p class="mt-3">
+                <span class="slide-change" data-slide="9"><i class="far fa-circle text-primary"></i></span>
+                <span class="slide-change" data-slide="10"><i class="far fa-circle text-primary"></i></span>
+                <span class="slide-change" data-slide="11"><i class="far fa-circle text-primary"></i></span>
+                <span><i class="fas fa-circle text-primary"></i></span>
+              </p>
+            </div>
+            <input type="hidden" name="country" id="non-artist-country">
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+  <p class="text-white text-center text-md-right" id="copyright"><small><a class="text-white" href="https://unsplash.com/@anik3t">Photo by Aniket Deole on Unsplash</a><br class="d-md-none"><span class="ml-5">&#9400;2018 Splatr, LLC</span></small></p>
+    <script type="text/javascript" src="/js/newUser.js"></script>
+</body>
+</html>

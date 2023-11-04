@@ -1,0 +1,744 @@
+<% include ../partials/header %>
+<style>
+  #banner {
+    <% if(artist.banner.url){ %>
+    background-image: linear-gradient(to right, rgba(244, 101, 182, .20), rgba(116, 2, 198, .20)),
+                      url("<%=artist.banner.url%>")
+                      ;
+    <% } else { %>
+    background-image: url("https://ayizan.blob.core.windows.net/site-images/rawpixel-781987-unsplash.jpg");
+    <% } %>
+  }  
+</style>
+<main>
+  <div class="background" id="banner"></div>
+  <hgroup>
+    <h1 id="artist-name">
+      <%=artist.username%>
+    </h1>
+    <h2 id="artist-motto">
+      <%=artist.motto%>
+    </h2>
+  </hgroup>
+  <%if(artist.profile.url){ %>
+  <div class="background" id="profile-picture" style="background-image:url('<%=artist.profile.url%>')"></div>
+  <% } else { %>
+  <div class="background" id="profile-picture" style="background-image:url('https://ayizan.blob.core.windows.net/site-images/icon.png')"></div>
+  <% } %>
+  <% if(currentUser && currentUser._id.toString() != artist._id.toString()){ %>
+  <%if(currentUser.following.indexOf(artist._id) == -1){ %>
+  <button type="button" class="follow follow-button" data-toggle="tooltip" data-placement="top" data-artist="<%=artist.username%>" title="Follow <%=artist.username%>"><i class="fas fa-plus fa-2x" id="follow-icon"></i></button>
+  <% } else if(currentUser.following.indexOf(artist._id) != -1){ %>
+  <button type="button" class="unfollow follow-button" data-toggle="tooltip" data-placement="top" data-artist="<%=artist.username%>" title="Unfollow <%=artist.username%>"><i class="fas fa-minus fa-2x" id="follow-icon"></i></button>
+  <% } %>
+  <% } %>
+  <section id="artist-block">
+    <hr>
+    <ul id="artist-info">
+      <% if(artist.commissions.length > 0){ %>
+      <li>
+        <%if(artist.open == true) {%>
+        <i class="far fa-check-circle fa-lg fa-fw"></i>
+        Commissions Open
+        <% } else { %>
+        <i class="far fa-times-circle fa-lg fa-fw"></i>
+        Commissions Closed
+        <% } %>
+      </li>
+      <% } %>
+      <% if(artist.completed.length > 0){ %>
+      <li>
+        <i class="far fa-trophy-alt fa-fw fa-lg"></i>
+        Completed: <%=artist.completed.length%>
+      </li>
+      <% } %>
+      <% if(artist.rating.length > 0){ %>
+        <% var sum = 0, avg = 0; %>
+        <% for(let rate of artist.rating){ %>
+          <% sum += Number(rate) %>
+        <% } %>
+        <% avg = Math.floor(sum/artist.rating.length)%>
+      <li>
+          <i class="far fa-star fa-fw fa-lg"></i>
+          Rating: <%=`${avg}% (${artist.rating.length})`%>
+        </li>
+      <% } %>
+      <% if(artist.fans.length > 0){ %>
+      <li>
+        <i class="far fa-user fa-lg fa-fw">
+        </i>
+        Followers: <%=artist.fans.length%>
+      </li>
+      <% } %>
+    </ul>
+    <hr>
+    <div id="artist-social">
+      <% let social = artist.social %>
+      <% if(social.behance){ %>
+      <a href="<%=social.behance%>" class="social-link">
+        <i class="fab fa-behance fa-fw fa-2x"></i>
+      </a>
+      <% } %>
+      <% if(social.deviantart){ %>
+      <a href="https://deviantart.com/<%=social.deviantart%>" class="social-link">
+        <i class="fab fa-deviantart fa-fw fa-2x"></i>
+      </a>
+      <% } %>
+      <% if(social.discord){ %>
+      <a href="<%=social.discord%>" class="social-link">
+        <i class="fab fa-discord fa-fw fa-2x"></i>
+      </a>
+      <% } %>
+      <% if(social.dribbble){ %>
+      <a href="https://dribbble.com/<%=social.dribbble%>" class="social-link">
+        <i class="fab fa-dribbble fa-fw fa-2x"></i>
+      </a>
+      <% } %>
+      <% if(social.etsy){ %>
+      <a href="https://etsy.com/shop/<%=social.etsy%>" class="social-link">
+        <i class="fab fa-etsy fa-fw fa-2x"></i>
+      </a>
+      <% } %>
+      <% if(social.facebook){ %>
+      <a href="<%=social.facebook%>" class="social-link">
+        <i class="fab fa-facebook fa-fw fa-2x"></i>
+      </a>
+      <% } %>
+      <% if(social.instagram){ %>
+      <a href="https://instagram.com/<%=social.instagram%>" class="social-link">
+        <i class="fab fa-instagram fa-fw fa-2x"></i>
+      </a>
+      <% } %>
+      <% if(social.patreon){ %>
+      <a href="https://patreon.com/<%=social.patreon%>" class="social-link">
+        <i class="fab fa-patreon fa-fw fa-2x"></i>
+      </a>
+      <% } %>
+      <% if(social.pinterest){ %>
+      <a href="https://pinterest.com/<%=social.pinterest%>" class="social-link">
+        <i class="fab fa-pinterest fa-fw fa-2x"></i>
+      </a>
+      <% } %>
+      <% if(social.soundcloud){ %>
+      <a href="https://soundcloud.com/<%=social.soundcloud%>" class="social-link">
+        <i class="fab fa-soundcloud fa-fw fa-2x"></i>
+      </a>
+      <% } %>
+      <% if(social.tumblr){ %>
+      <a href="https://<%=social.tumblr%>.tumblr.com" class="social-link">
+        <i class="fab fa-tumblr fa-fw fa-2x"></i>
+      </a>
+      <% } %>
+      <% if(social.twitch){ %>
+      <a href="https://twitch.tv/<%=social.twitch%>" class="social-link">
+        <i class="fab fa-twitch fa-fw fa-2x"></i>
+      </a>
+      <% } %>
+      <% if(social.twitter){ %>
+      <a href="https://twitter.com/<%=social.twitter%>" class="social-link">
+        <i class="fab fa-twitter fa-fw fa-2x"></i>
+      </a>
+      <% } %>
+      <% if(social.vimeo){ %>
+      <a href="<%=social.vimeo%>" class="social-link">
+        <i class="fab fa-vimeo fa-fw fa-2x"></i>
+      </a>
+      <% } %>
+      <% if(social.youtube){ %>
+      <a href="<%=social.youtube%>" class="social-link">
+        <i class="fab fa-youtube fa-fw fa-2x"></i>
+      </a>
+      <% } %>
+    </div>
+  </section>
+  <section id="artist-menu">
+    <ul>
+      <%if(artist.commissions.length > 0){ %>
+      <li>
+        <button type="button" class="menu-button" data-section="commissions">
+          Commissions
+        </button>
+      </li>
+      <% } %>
+      <% if(artist.gallery.commissioned.length > 0){ %>
+      <li>
+        <button type="button" class="menu-button" data-section="priors">
+          Prior Commissions
+        </button>
+      </li>
+      <% } %>
+      <% if(artist.gallery.non_commissioned.length > 0 || (currentUser && currentUser._id.toString() == artist._id.toString())){ %>
+      <li>
+      <button type="button" class="menu-button" data-section="gallery">
+        Gallery
+      </button>
+      </li>
+      <% } %>
+      <% if(artist.completed.length > 0){ %>
+      <li>
+        <button type="button" class="menu-button" data-section="reviews">
+          Reviews
+        </button>
+      </li>
+      <% } %>
+      <% if(artist.fans.length > 0){ %>
+      <li>
+        <button type="button" class="menu-button" data-section="fans">
+          Fans
+        </button>
+      </li>
+      <% } %>
+      <% if(!artist.banner.url){ %>
+      <li>
+        Photo by <a href="https://unsplash.com/@rawpixel">Rawpixel</a> on <a href="https://unsplash.com">Unsplash</a>
+      </li>
+      <% } %>
+      <!--<li>-->
+      <!--  <button type="button" class="sign-up ml-3" id="share-artist" data-toggle="modal" data-target="#share-modal"><i class="fal fa-share-alt fa-lg fa-fw mr-3"></i>Share Artist</button>-->
+      <!--</li>-->
+    </ul>
+  </section>
+  <h2 class="inactive" id="fetch-alert"></h2>
+  <div class="inactive" id="alert-box"></div>
+  <% if(artist.description){ %>
+  <div id="artist-description">
+    <h3>Who is <%=artist.username%>?</h3>
+    <p><%=artist.description%></p>
+  </div>
+  <% } %>
+  <% if(artist.commissions.length > 0){ %>
+  <section class="showcase inactive" id="commissions">
+    <h1 class="showcase-title">Commissions</h1>
+    <% for(let commission of artist.commissions){ %>
+      <% if(commission.available > 0 || commission.available == null){ %>
+        <% if(commission.NSFW == true){ %>
+          <% if(age == false || currentUser.nsfw_filter == true){ %>
+          <div class="d-none">
+          <% } %>
+        <% } %>
+    <article class="commission">
+      <button class="commission-img" style="background-image:url('<%=commission.example.url%>')" data-src="<%=commission.example.url%>" data-name="<%=commission.name%>"></button>
+      <div class="commission-info">
+        <% if(commission.name){ %>
+        <h1 class="commission-name"><%=commission.name%></h1>
+        <% } %>
+        <% if(commission.NSFW == true){ %>
+        <p class="badge badge-info">NSFW</p>
+        <% } %>
+        <h2 class="commission-price">$<%=(commission.price/100).toFixed(0)%></h2>
+        <% if(commission.available){ %>
+        <h2 class="commission-available">Number Available: <%=commission.available%></h2>
+        <% } %>
+        <p><%=commission.description%></p>
+        <% if(commission.tags.length > 0){ %>
+          <p>
+          <% for(let tag of commission.tags){ %>
+            <% if(tag.length > 1){ %>
+          <a href="/find?q=<%=tag%>" class="tag-link">#<%=tag%></a>
+            <% } %>
+          <% } %>
+          </p>
+        <% } %>
+        <% if(currentUser){ %>
+        <button type="button" class="report-btn" data-id="<%=commission._id%>" data-name="<%=commission.name%>" data-artist="<%=artist.username%>">Report</button>
+          <% if(artist.open == true){ %>
+        <button type="button" class="btn btn-primary btn-block request-btn" data-artist="<%=artist.username%>" data-id="<%=commission._id%>" data-price="<%=commission.price%>" data-name="<%=commission.name%>" data-artist_id="<%=artist._id%>">Request</button>
+          <% } %>
+        <% } %>
+      </div>
+    </article>
+        <% if(commission.NSFW == true){ %>
+          <% if(age == false || currentUser.nsfw_filter == true){ %>
+          </div>
+          <% } %>
+        <% } %>
+      <% } %>
+    <% } %>
+  </section>
+  <% } %>
+  <% if(artist.gallery.commissioned.length > 0){ %>
+  <section class="showcase inactive" id="priors">
+    <h1 class="showcase-title">Prior Commissions</h1>
+    <% for(let artwork of artist.gallery.commissioned){ %>
+      <% if(artwork.paid == true){ %>
+        <% if(artwork.NSFW == true){ %>
+          <% if(age == true && currentUser.nsfw_filter == false){ %>
+      <a href="/gallery/<%=artist.username%>/<%=artwork._id%>" class="gallery-link">
+        <div class="gallery-img" style="background-image:url('<%=artwork.image[0].url%>')"></div>
+      </a>    
+          <% } else if(!currentUser) { %>
+      <a href="#" class="gallery-link nsfw age">
+        <div class="gallery-img" style="background-image:url('<%=artwork.image[0].url%>')"></div>
+        <p>You need to be logged in and over 18 to view this.</p>
+      </a>    
+          <% } else if(currentUser.nsfw_filter == true){ %>
+      <a href="/gallery/<%=artist.username%>/<%=artwork._id%>" class="gallery-link nsfw">
+        <div class="gallery-img" style="background-image:url('<%=artwork.image[0].url%>')"></div>
+        <p>You've asked us not to show you this content.</p>
+      </a>     
+          <% } %>
+        <% } else { %>
+      <a href="/gallery/<%=artist.username%>/<%=artwork._id%>" class="gallery-link">
+        <div class="gallery-img" style="background-image:url('<%=artwork.image[0].url%>')"></div>
+      </a>
+        <% } %>
+      <% } %>
+    <% } %>
+  </section>
+  <% } %>
+  <% if(artist.gallery.non_commissioned.length > 0 || (currentUser && currentUser._id.toString() == artist._id.toString())){ %>
+  <section class="showcase inactive" id="gallery">
+    <h1 class="showcase-title">Gallery</h1>
+    <% if(currentUser && artist._id.toString() == currentUser._id.toString()){ %>
+    <button type="button" id="new-gallery-button" data-toggle="modal" data-target="#new-gallery-modal">
+      <i class="far fa-plus fa-3x fa-lg"></i>
+      <span>Add a New Piece to The Gallery</span>
+    </button>
+    <% } %>
+    <% for(let art of artist.gallery.non_commissioned) { %>
+      <% if(art.NSFW == true){ %>
+        <% if(age == true && currentUser.nsfw_filter == false){ %>
+      <a href="/gallery/<%=artist.username%>/<%=art.linked_title%>" class="gallery-link">
+        <div class="gallery-img" style="background-image:url('<%=art.image[0].url%>')"></div>
+      </a>    
+        <% } else if(!currentUser) { %>
+      <a href="#" class="gallery-link nsfw age">
+        <div class="gallery-img" style="background-image:url('<%=art.image[0].url%>')"></div>
+        <p>You need to be logged in and over 18 to view this.</p>
+      </a>    
+        <% } else if(currentUser.nsfw_filter == true){ %>
+      <a href="/gallery/<%=artist.username%>/<%=art.linked_title%>" class="gallery-link nsfw">
+        <div class="gallery-img" style="background-image:url('<%=art.image[0].url%>')"></div>
+        <p>You've asked us not to show you this content.</p>
+      </a>     
+        <% } %>
+      <% } else { %>
+      <a href="/gallery/<%=artist.username%>/<%=art.linked_title%>" class="gallery-link">
+        <div class="gallery-img" style="background-image:url('<%=art.image[0].url%>')"></div>
+      </a>
+      <% } %>
+    <% } %>
+  </section>
+  <% } %>
+  <% if(artist.completed.length > 0){ %>
+  <section class="showcase inactive" id="reviews">
+    <h1 class="showcase-title">Reviews - <small>
+        <% if(avg < 10){ %>
+			  <i class="far fa-star text-primary fa-fw"></i>
+			  <i class="far fa-star text-primary fa-fw"></i>
+			  <i class="far fa-star text-primary fa-fw"></i>
+			  <i class="far fa-star text-primary fa-fw"></i>
+			  <i class="far fa-star text-primary fa-fw"></i>
+			  <% } else if(avg > 9 && avg < 20){ %>
+			  <i class="fas fa-star-half text-primary fa-fw"></i>
+			  <i class="far fa-star text-primary fa-fw"></i>
+			  <i class="far fa-star text-primary fa-fw"></i>
+			  <i class="far fa-star text-primary fa-fw"></i>
+			  <i class="far fa-star text-primary fa-fw"></i>
+			  <% } else if(avg > 19 && avg < 30) { %>
+			  <i class="fas fa-star text-primary fa-fw"></i>
+			  <i class="far fa-star text-primary fa-fw"></i>
+			  <i class="far fa-star text-primary fa-fw"></i>
+			  <i class="far fa-star text-primary fa-fw"></i>
+			  <i class="far fa-star text-primary fa-fw"></i>
+			  <% } else if(avg > 29 && avg < 40) { %>
+			  <i class="fas fa-star text-primary fa-fw"></i>
+			  <i class="fas fa-star-half text-primary fa-fw"></i>
+			  <i class="far fa-star text-primary fa-fw"></i>
+			  <i class="far fa-star text-primary fa-fw"></i>
+			  <i class="far fa-star text-primary fa-fw"></i>
+			  <% } else if(avg > 39 && avg < 50) { %>
+			  <i class="fas fa-star text-primary fa-fw"></i>
+			  <i class="fas fa-star text-primary fa-fw"></i>
+			  <i class="far fa-star text-primary fa-fw"></i>
+			  <i class="far fa-star text-primary fa-fw"></i>
+			  <i class="far fa-star text-primary fa-fw"></i>
+			  <% } else if(avg > 49 && avg < 60) { %>
+			  <i class="fas fa-star text-primary fa-fw"></i>
+			  <i class="fas fa-star text-primary fa-fw"></i>
+			  <i class="fas fa-star-half text-primary fa-fw"></i>
+			  <i class="far fa-star text-primary fa-fw"></i>
+			  <i class="far fa-star text-primary fa-fw"></i>
+			  <% } else if(avg > 59 && avg < 70) { %>
+			  <i class="fas fa-star text-primary fa-fw"></i>
+			  <i class="fas fa-star text-primary fa-fw"></i>
+			  <i class="fas fa-star text-primary fa-fw"></i>
+			  <i class="far fa-star text-primary fa-fw"></i>
+			  <i class="far fa-star text-primary fa-fw"></i>
+			  <% } else if(avg > 69 && avg < 80) { %>
+			  <i class="fas fa-star text-primary fa-fw"></i>
+			  <i class="fas fa-star text-primary fa-fw"></i>
+			  <i class="fas fa-star text-primary fa-fw"></i>
+			  <i class="fas fa-star-half text-primary fa-fw"></i>
+			  <i class="far fa-star text-primary fa-fw"></i>
+			  <% } else if(avg > 79 && avg < 90) { %>
+			  <i class="fas fa-star text-primary fa-fw"></i>
+			  <i class="fas fa-star text-primary fa-fw"></i>
+			  <i class="fas fa-star text-primary fa-fw"></i>
+			  <i class="fas fa-star text-primary fa-fw"></i>
+			  <i class="far fa-star text-primary fa-fw"></i>
+			  <% } else if(avg > 89 && avg < 100) { %>
+			  <i class="fas fa-star text-primary fa-fw"></i>
+			  <i class="fas fa-star text-primary fa-fw"></i>
+			  <i class="fas fa-star text-primary fa-fw"></i>
+			  <i class="fas fa-star text-primary fa-fw"></i>
+			  <i class="fas fa-star-half text-primary fa-fw"></i>
+			  <% } else if(avg == 100) { %>
+			  <i class="fas fa-star text-primary fa-fw"></i>
+			  <i class="fas fa-star text-primary fa-fw"></i>
+			  <i class="fas fa-star text-primary fa-fw"></i>
+			  <i class="fas fa-star text-primary fa-fw"></i>
+			  <i class="fas fa-star text-primary fa-fw"></i>
+	      <% } %>
+	      (<%=avg%>%)</small></h1>
+	      <% artist.completed.slice(-5).forEach((rev)=>{ %>
+          <div class="col-12 mb-3" id="<%=rev._id%>">
+            <div class="media">
+  					  <a class="pull-left" <%if(rev.client){%>href="/<%=rev.client.username%>"<%}%>>
+  					  <%if(rev.client){ %>
+  					    <%if(rev.client.profile){ %>
+                <div class="avatar">
+                <img class="media-object img-raised" alt="64x64" src="<%=rev.client.profile%>">
+                </div>
+                <% } else { %>
+                <i class="far fa-user fa-4x" data-fa-transform="left-3"></i>
+                <% } %>
+  					  <% } %>
+  					  </a>
+  					  <div class="media-body">
+  					    <% function dayPassed(date){ %>
+                  <% let postDate = new Date(date), months = ['January','February','March','April','May','June','July','August','September','October','November','December'],day = postDate.getDate(),month = months[postDate.getMonth()],year=postDate.getFullYear(),string=`${month} ${day}, ${year}`, milli = Date.parse(string),millisecondsPassed = (Date.now() - milli); %>
+                  <% if(millisecondsPassed < 86400000){ %>
+                    <% if(millisecondsPassed < 3600000){ %>
+                      <% let minutes = Math.floor(millisecondsPassed / 60000); %>
+                      <% return `${minutes} Minutes Ago`; %>
+                    <% } else { %>
+                      <% let hours = Math.floor(millisecondsPassed / 3600000); %>
+                      <% return `${hours} Hours Ago`; %>
+                    <% } %>
+                  <% } else { %>
+                    <% return string; %>
+                  <% } %>
+                <% } %>
+  							<h5 class="media-heading"><%if(rev.client){%><%=rev.client.username%><%} else {%>Deactivated<%}%> <small class="text-muted mx-3"><%=dayPassed(Date.parse(rev.dates.review))%></small>
+  							</h5>
+  							<h5>
+  							  <% if(rev.rating < 10){ %>
+  							  <i class="far fa-star text-primary fa-fw"></i>
+  							  <i class="far fa-star text-primary fa-fw"></i>
+  							  <i class="far fa-star text-primary fa-fw"></i>
+  							  <i class="far fa-star text-primary fa-fw"></i>
+  							  <i class="far fa-star text-primary fa-fw"></i>
+  							  <% } else if(rev.rating > 9 && rev.rating < 20){ %>
+  							  <i class="fas fa-star-half text-primary fa-fw"></i>
+  							  <i class="far fa-star text-primary fa-fw"></i>
+  							  <i class="far fa-star text-primary fa-fw"></i>
+  							  <i class="far fa-star text-primary fa-fw"></i>
+  							  <i class="far fa-star text-primary fa-fw"></i>
+  							  <% } else if(rev.rating > 19 && rev.rating < 30) { %>
+  							  <i class="fas fa-star text-primary fa-fw"></i>
+  							  <i class="far fa-star text-primary fa-fw"></i>
+  							  <i class="far fa-star text-primary fa-fw"></i>
+  							  <i class="far fa-star text-primary fa-fw"></i>
+  							  <i class="far fa-star text-primary fa-fw"></i>
+  							  <% } else if(rev.rating > 29 && rev.rating < 40) { %>
+  							  <i class="fas fa-star text-primary fa-fw"></i>
+  							  <i class="fas fa-star-half text-primary fa-fw"></i>
+  							  <i class="far fa-star text-primary fa-fw"></i>
+  							  <i class="far fa-star text-primary fa-fw"></i>
+  							  <i class="far fa-star text-primary fa-fw"></i>
+  							  <% } else if(rev.rating > 39 && rev.rating < 50) { %>
+  							  <i class="fas fa-star text-primary fa-fw"></i>
+  							  <i class="fas fa-star text-primary fa-fw"></i>
+  							  <i class="far fa-star text-primary fa-fw"></i>
+  							  <i class="far fa-star text-primary fa-fw"></i>
+  							  <i class="far fa-star text-primary fa-fw"></i>
+  							  <% } else if(rev.rating > 49 && rev.rating < 60) { %>
+  							  <i class="fas fa-star text-primary fa-fw"></i>
+  							  <i class="fas fa-star text-primary fa-fw"></i>
+  							  <i class="fas fa-star-half text-primary fa-fw"></i>
+  							  <i class="far fa-star text-primary fa-fw"></i>
+  							  <i class="far fa-star text-primary fa-fw"></i>
+  							  <% } else if(rev.rating > 59 && rev.rating < 70) { %>
+  							  <i class="fas fa-star text-primary fa-fw"></i>
+  							  <i class="fas fa-star text-primary fa-fw"></i>
+  							  <i class="fas fa-star text-primary fa-fw"></i>
+  							  <i class="far fa-star text-primary fa-fw"></i>
+  							  <i class="far fa-star text-primary fa-fw"></i>
+  							  <% } else if(rev.rating > 69 && rev.rating < 80) { %>
+  							  <i class="fas fa-star text-primary fa-fw"></i>
+  							  <i class="fas fa-star text-primary fa-fw"></i>
+  							  <i class="fas fa-star text-primary fa-fw"></i>
+  							  <i class="fas fa-star-half text-primary fa-fw"></i>
+  							  <i class="far fa-star text-primary fa-fw"></i>
+  							  <% } else if(rev.rating > 79 && rev.rating < 90) { %>
+  							  <i class="fas fa-star text-primary fa-fw"></i>
+  							  <i class="fas fa-star text-primary fa-fw"></i>
+  							  <i class="fas fa-star text-primary fa-fw"></i>
+  							  <i class="fas fa-star text-primary fa-fw"></i>
+  							  <i class="far fa-star text-primary fa-fw"></i>
+  							  <% } else if(rev.rating > 89 && rev.rating < 100) { %>
+  							  <i class="fas fa-star text-primary fa-fw"></i>
+  							  <i class="fas fa-star text-primary fa-fw"></i>
+  							  <i class="fas fa-star text-primary fa-fw"></i>
+  							  <i class="fas fa-star text-primary fa-fw"></i>
+  							  <i class="fas fa-star-half text-primary fa-fw"></i>
+  							  <% } else if(rev.rating == 100) { %>
+  							  <i class="fas fa-star text-primary fa-fw"></i>
+  							  <i class="fas fa-star text-primary fa-fw"></i>
+  							  <i class="fas fa-star text-primary fa-fw"></i>
+  							  <i class="fas fa-star text-primary fa-fw"></i>
+  							  <i class="fas fa-star text-primary fa-fw"></i>
+  					      <% } %>
+  							</h5>
+  							<p><%=rev.review%>
+  							</p>
+  					  </div>
+  				  </div>
+  				</div>
+  				<% });%>
+  </section>
+  <% } %>
+  <% if(artist.fans.length > 0){ %>
+  <section class="showcase inactive" id="fans">
+    <h1 class="showcase-title">Fans</h1>
+    <article>
+      <% for(let fan of artist.fans){ %>
+      <a href="/<%=fan.username%>" class="fan-link">
+        <% if(fan.profile.url){ %>
+        <div class="fan-image" style="background-image:url('<%=fan.profile.url%>')"></div>
+        <% } else { %>
+        <p class="mb-0"><i class="far fa-user fa-lg fa-fw"></i></p>
+        <% } %>
+        <p class="fan-name"><%=fan.username%></p>
+      </a>
+      <% } %>
+    </article>
+  </section>
+  <% } %>
+</main>
+<div class="modal fade" id="report-modal" tabindex="-1" role="dialog" aria-labelledby="report-label" aria-hidden="true">
+  <div class="modal-dialog modal-notice">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+            <i class="far fa-times fa-lg text-primary"></i>
+        </button>
+        <h5 class="modal-title" id="report-label">
+        </h5>
+      </div>
+      <div class="modal-body" id="modal-body">
+        <div class="spinner inactive" id="report-spinner">
+          <div class="double-bounce1"></div>
+          <div class="double-bounce2"></div>
+        </div>
+        <div id="report-form">
+          <div class="row">
+            <div class="col-12">
+              <form method="POST" id="report-commission">
+                <div class="custom-control custom-radio">
+                  <input type="radio" id="age" name="reportImage" class="custom-control-input" value="age">
+                  <label class="custom-control-label" for="age">Artist is too young to offer this type of content.</label>
+                </div>
+                <div class="custom-control custom-radio">
+                  <input type="radio" id="NSFW" name="reportImage" class="custom-control-input" value="NSFW">
+                  <label class="custom-control-label" for="NSFW">This content should be labelled as Not Safe For Work.</label>
+                </div>
+                <div class="custom-control custom-radio">
+                  <input type="radio" id="under-age" name="reportImage" class="custom-control-input" value="under-age">
+                  <label class="custom-control-label" for="under-age">This work displays inappropriate content about an underaged subject. </label>
+                </div>
+                <div class="custom-control custom-radio">
+                  <input type="radio" id="TOS" name="reportImage" class="custom-control-input" value="TOS">
+                  <label class="custom-control-label" for="TOS">This content violates our <a href="/terms">Terms of Service.</a></label>
+                </div>
+                <div class="custom-control custom-radio">
+                  <input type="radio" id="other" name="reportImage" class="custom-control-input" value="other">
+                  <label class="custom-control-label" for="other">Something Else.</label>
+                </div>
+                <textarea class="form-control inactive" name='other' id="report-text" max="100" placeholder="Please describe why you are reporting this artwork."></textarea>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+        <button type="submit" class="btn btn-primary report-submit" id="report-submit" form="report-commission">Submit</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal fade" id="example-modal" tabindex="-1" role="dialog" aria-labelledby="example-label" aria-hidden="true">
+  <div class="modal-dialog modal-notice">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="example-label"></h5>
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+            <i class="far fa-times fa-lg text-danger"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="row justify-content-center">
+          <div class="col-10 text-center">
+            <img class="img-fluid" id="example-image">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<% if(artist.open == true){ %>
+<div class="modal fade" id="request-modal" tabindex="-1" role="dialog" aria-labelledby="request-label" aria-hidden="true">
+  <div class="modal-dialog modal-notice">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="request-label"></h5>
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+          <span class="text-danger">&times;</span>
+          <!--<i class="far fa-times fa-lg text-primary"></i>-->
+        </button>
+      </div>
+      <div class="modal-body">
+        <h1 id="request-price"></h1>
+        <div class="spinner inactive" id="request-spinner">
+          <div class="double-bounce1"></div>
+          <div class="double-bounce2"></div>
+        </div>
+        <form id="request-form">
+          <label for="request-description">
+            Please describe your request as clearly as possible. You have 300 characters.
+          </label>
+          <textarea maxlength="300" class="form-control" id="request-description"></textarea>
+          <div class="upload" id="request-upload-block" data-multiple="true">
+            <i class="far fa-cloud-upload-alt fa-5x"></i>
+            <p>Drag your references here or click the button to upload. You can upload a max of 5 references.</p>
+            <div class="meter full inactive" id="upload-progress">
+              <span>Processing Upload<span></span></span>
+            </div>
+            <div class="preview-player"></div>
+            <div class="preview-images multiple">
+            </div>
+            <label for="request-input" id="request-label" class="btn btn-simple btn-sm">Upload</label>
+            <input type="file" id="request-input" name="images" class="d-none ref-input" accept="image/*" multiple>
+            <p class="preview-instructions">Click on a file's "X" to remove it.</p>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="submit" class="btn btn-success mx-auto" id="request-submit">Send Request</button>
+      </div>
+    </div>
+  </div>
+</div>
+<% } %>
+<!--<div class="modal fade" id="share-modal" tabindex="-1" role="dialog" aria-labelledby="share-label" aria-hidden="true">-->
+<!--  <div class="modal-dialog modal-notice">-->
+<!--    <div class="modal-content">-->
+<!--      <div class="modal-header">-->
+<!--        <h5 class="modal-title" id="share-label">Share <%=artist.username%></h5>-->
+<!--        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">-->
+<!--          <i class="far fa-times fa-lg text-primary"></i>-->
+<!--        </button>-->
+<!--      </div>-->
+<!--      <div class="modal-body">-->
+<!--        <button type="button" class="btn btn-facebook p-3 mx-1"><i class="fab fa-facebook fa-lg fa-fw"></i></button>-->
+<!--        <button type="button" class="btn btn-twitter p-3 mx-1"><i class="fab fa-twitter fa-lg fa-fw"></i></button>-->
+<!--      </div>-->
+<!--    </div>-->
+<!--  </div>-->
+<!--</div>-->
+<% if(currentUser && currentUser._id.toString() == artist._id.toString()) { %>
+<div class="modal fade" id="new-gallery-modal" tabindex="-1" role="dialog" aria-labelledby="new-gallery-label" aria-hidden="true">
+  <div class="modal-dialog modal-notice">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="new-gallery-label">Add a New Piece to the Gallery</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+          <i class="far fa-times fa-lg text-primary"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="spinner inactive" id="new-gallery-spinner">
+          <div class="double-bounce1"></div>
+          <div class="double-bounce2"></div>
+        </div>
+        <form id="new-gallery-form">
+          <div class="upload span-2" data-multiple="true">
+            <i class="far fa-cloud-upload-alt fa-5x"></i>
+            <p>Drag your images here or click the button to upload. You can upload a max of 10 images that are each under 10MB</p>
+            <div class="multiple"></div>
+            <label for="new-gallery-input" class="btn btn-simple btn-sm">Upload</label>
+            <input type="file" id="new-gallery-input" name="images" class="d-none ref-input img-input" accept="image/*" multiple>
+            <p class="preview-instructions">Click on an image to remove it.</p>
+          </div>
+          <div class="form-group span-2">
+            <label for="title">Title<span class="text-danger ml-1">*</span></label>
+            <input type="text" class="form-control" id="title" placeholder="Give Your Piece A Title" required>
+          </div>
+          <div class="form-group span-2">
+            <label for="description">Description<span class="text-danger ml-1">*</span></label>
+            <textarea maxlength="200" class="form-control" id="description" placeholder="Tell Us All About Your Creation. Keep It Under 200 Characters." required></textarea>
+          </div>
+          <div class="form-group span-2">
+            <label for="alt">Alt Text<span class="text-danger ml-1">*</span></label>
+            <textarea class="form-control" id="alt" placeholder="Be as descriptive as possible because this is for people who either use screen readers or cannot load images." required></textarea>
+          </div>
+          <div class="form-group span-2">
+            <label for="tags">Tags</label>
+            <input type="text" class="form-control" id="tags" placeholder="Separate Each With a #">
+          </div>
+          <div class="form-group pr-3">
+            <label for="type">Commission Type<span class="text-danger ml-1">*</span></label>
+            <select class="custom-select" id="type">
+              <option selected disabled value="">Select Type</option>
+              <!--<option value="animation">Animation</option>-->
+                <option value="comic">Comic</option>
+                <option value="craft">Craft</option>
+                <option value="digital">Digital Art</option>
+                <option value="graphic_design">Graphic Design</option>
+                <!--<option value="fiction">Fiction</option>-->
+                <!--<option value="film">Film</option>-->
+                <!--<option value="non-fiction">Non-Fiction</option>-->
+                <option value="photo">Photo</option>
+                <!--<option value="poetry">Poetry</option>-->
+                <option value="traditional">Traditional Art</option>
+            </select>
+          </div>
+          <% if(age == true){ %>
+          <div class="form-group">
+            <label for="nsfw">NSFW</label>
+            <div class="radio" id="nsfw">
+              <input type="radio" name="NSFW" value="yes" id="nsfw-yes">
+              <label for="nsfw-yes" class="mr-3">Yup.</label>
+              <input type="radio" name="NSFW" value="no" id="nsfw-no">
+              <label for="nsfw-no" class="mr-3">Nope.</label>
+            </div>
+          </div>
+          <% } %>
+          <div class="form-group span-2">
+            <label for="new-gallery-mods">Modifications</label>
+            <div id="new-gallery-mods">
+              <div class="checkbox">
+                <input type="checkbox" name="watermark" value="watermark" id="watermark">
+                <label class="text-white" for="watermark">Add Splatr Watermark</label>
+              </div>
+              <div class="checkbox">
+                <input type="checkbox" name="downscale" value="downscale" id="downscale">
+                <label for="downscale">Downscale Image</label>
+              </div>
+            </div>
+          </div>
+          <label for="honey" class="sr-only">Please don't fill this out. It's just to catch bots.</label>
+          <input type="text" class="d-none" id="honey">
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="reset" class="btn btn-secondary mr-auto" data-dismiss="modal" aria-hidden="true" form="new-gallery-form">Cancel</button>
+        <button type="button" class="btn btn-success" id="gallery-submit">Save Piece</button> 
+      </div>
+    </div>
+  </div>
+</div>
+<% } %>
+<% include ../partials/footer %>

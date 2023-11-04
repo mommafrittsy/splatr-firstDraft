@@ -1,0 +1,139 @@
+.background-btn {
+  background-position: 50% 50%;
+  background-repeat: no-repeat;
+  background-size: cover;
+  border-radius: .25rem;
+  box-shadow: 5px 5px 6px rgba(0,0,0,.16);
+  height: 100px;
+  margin: 15px;
+  width: 100px;
+}
+.background-btn:nth-of-type(1){
+  background-color: #f0efea;
+}
+.background-btn:nth-of-type(2){
+  background-color: #3f3050;
+}
+.crop-modal-btn:hover {
+  box-shadow: 5px 5px 6px rgba(0,0,0,.16);
+  cursor: pointer;
+}
+#crop-upload > button {
+  grid-column: 1/4;
+  grid-row: 3/4;
+  justify-self: center;
+}
+#crop-upload > .cropper-div {
+  grid-column: 1/4;
+  grid-row: 1/3;
+}
+#delete-account p, #delete-account a {
+  margin: 15px;
+}
+.detail-buttons {
+  height: 0;
+  opacity: 0;
+  transition: all 300ms ease-in-out;
+}
+.detail-buttons > button {
+  height: 0;
+  padding: 0 15px;
+  opacity: 0;
+  transition: all 300ms ease-in-out;
+}
+.detail-buttons.detail-open {
+  height: auto;
+  opacity: 1;
+}
+.detail-buttons.detail-open > button {
+  height: auto;
+  opacity: 1;
+  padding: 5px 15px;
+}
+#profile label {
+  font-size: 16pt;
+}
+#settings {
+ display: grid;
+ grid-column-gap: 15px;
+ grid-row-gap: 15px;
+ grid-template-columns: 1fr;
+ grid-template-rows: repeat(6, auto);
+}
+#profile > #background-btns {
+  align-items: start;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: start;
+}
+#profile > #crop-blocks {
+  padding: 15px;
+  text-align: center;
+}
+#profile > #crop-blocks > img {
+  border-radius: .25rem;
+  margin: 0 auto;
+}
+#profile > div {
+  padding: 15px;
+}
+#settings .block {
+  margin: 15px;
+}
+#settings form {
+  padding: 15px;
+}
+@media (min-width: 800px){
+  #profile > #crop-blocks {
+    align-items: center;
+    display: grid;
+    grid-column-gap: 15px;
+    grid-row-gap: 15px;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto auto auto;
+    justify-content: center;
+  }
+  #profile > #crop-blocks > h3 {
+    font-size: 16pt;
+    grid-row: 1;
+    text-align: left;
+  }
+  #profile > #crop-blocks > img {
+    grid-row: 2;
+  }
+  #profile > #crop-blocks > p {
+    grid-row: 3;
+  }
+  #settings {
+    grid-template-columns: 300px 1fr;
+    grid-template-rows: auto;
+  }
+  #social-accounts > form {
+    display: grid;
+    grid-column-gap: 15px;
+    grid-row-gap: 15px;
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(8, auto);
+  }
+}
+@media (min-width: 1200px){
+  #profile > #crop-blocks {
+    grid-template-columns: 1fr 2fr;
+  }
+  #social-accounts > form {
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: repeat(4, auto);
+  }
+  #social-accounts > form:nth-child(1n) {
+    grid-column: 1;
+  }
+  #social-accounts > form:nth-child(2n) {
+    grid-column: 2;
+  }
+  #social-accounts > form:nth-child(3n) {
+    grid-column: 3;
+  }
+  #social-accounts > form:nth-child(4n) {
+    grid-column: 4;
+  }
+}

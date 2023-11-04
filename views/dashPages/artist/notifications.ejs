@@ -1,0 +1,28 @@
+<section class="inactive" id="notifications">
+  <% if(user.notifications.length > 1){ %>
+  <button type="button" class="btn btn-danger" id="notification-remove">Remove All</button>
+  <% } %>
+  <div id="notification-holder">
+    <%for(let note of user.notifications){ %>
+    <article class="notification">
+      <a href="<%=note.url%>">
+        <% if(['accept','previewAccept','like','commentLike'].includes(note.type)){ %>
+        <i class="far fa-fw fa-2x fa-thumbs-up"></i>
+        <% } else if(['paid','deposit'].includes(note.type)){ %>
+        <i class="far fa-fw fa-2x fa-credit-card-front"></i>
+        <% } else if(['transComment','comment'].includes(note.type)){ %>
+        <i class="far fa-fw fa-2x fa-comments"></i>
+        <% } else if(['new','request','references','preview','final'].includes(note.type)){ %>
+        <i class="far fa-fw fa-2x fa-images"></i>
+        <% } else if(note.type == 'review'){ %>
+        <i class="far fa-fw fa-2x fa-pencil"></i>
+        <% } else if(['follow', 'open'].includes(note.type)){ %>
+        <i class="far fa-fw fa-2x fa-user-friends"></i>
+        <% } %>
+        <p><%=note.text%></p>
+      </a>
+      <button type="button" class="delete-note-btn" data-id="<%=note.id%>"><i class="far fa-times fa-fw"></i></button>
+    </article>
+    <% } %>
+  </div>
+</section>

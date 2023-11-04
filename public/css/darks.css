@@ -1,0 +1,24 @@
+h1, h2, h3, h4, h5,
+h6, i, p:not(.nav-link), td, th,
+label, .h3,
+input::placeholder,
+textarea::placeholder,
+textarea, a:not(.nav-link),
+input, svg{
+  color: #fff !important;
+}
+.card-header, .h5, .h6 {
+  color: #aaa;
+}
+.card {
+  border-radius: 5px;
+  box-shadow: 0px 3px 10px 0px rgba(25, 25, 25, 0.5);
+  background-color: #252525;
+  opacity: .85;
+}
+.card-body{
+  overflow-x: auto;
+}
+textarea, input {
+  background: transparent !important;
+}

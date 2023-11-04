@@ -1,0 +1,130 @@
+#about-text {
+  grid-row: 4;
+  padding: 50px;
+}
+#bar {
+  grid-column: 1;
+  grid-row: 3;
+  padding: 25px;
+  text-align: center;
+}
+body {
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows:75px auto 1fr;
+}
+#credit {
+  display: none;
+}
+footer {
+  grid-row: 5;
+  grid-column:1;
+}
+.icon {
+  margin: auto;
+  width: 300px;
+}
+#image {
+  display: none;
+}
+#nate > .profile{
+  background-image: url("https://ayizan.blob.core.windows.net/site-images/nate.jpg");
+  background-position: 50% 0%;
+}
+#jordan > .profile {
+  background-image: url("https://ayizan.blob.core.windows.net/site-images/nate.jpg");
+  background-position: 50% 0%;
+}
+#rachel > .profile {
+  background-image: url("https://ayizan.blob.core.windows.net/site-images/rachel.jpg");
+  background-position: 50% 0%;
+}
+#sarah > .profile {
+  background-image: url("https://ayizan.blob.core.windows.net/site-images/sarah.jpg");
+
+}
+#people {
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: repeat(4, auto);
+  margin: 50px 25px;
+}
+.person {
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: 400px auto auto;
+}
+.person > .profile {
+  grid-column: 1;
+  grid-row: 1;
+}
+.person > hgroup {
+  grid-column: 1;
+  grid-row:2;
+  margin-top: 15px;
+}
+.person > p {
+  grid-column: 1;
+  grid-row: 3;
+}
+.profile {
+  background-position: 50% 0%;
+  border-top-left-radius: .25rem;
+  border-top-right-radius: .25rem;
+}
+@media (min-width: 800px){
+  body {
+    background-image: none;
+  }
+  #bar {
+    display: grid;
+    grid-template-columns: 50px 3fr 3fr 50px;
+    grid-template-rows: 1fr auto;
+    height: 500px;
+    overflow: hidden;
+    padding: 0;
+  }
+  #bar > h1 {
+    grid-column: 3;
+    grid-row: 1;
+    margin: auto 25px;
+    text-align: right;
+  }
+  #credit {
+    display: inline-block;
+    font-size: .6rem;
+    grid-column: 3;
+    grid-row: 2;
+    margin-top: auto;
+    text-align: right;
+  }
+  #image {
+    background-image: linear-gradient(60deg, rgba(255, 255, 255, .05), rgba(255,255,255,1) 60%),
+                      url("https://ayizan.blob.core.windows.net/site-images/zoltan-kovacs-272629-unsplash.jpg");
+    background-position: 100% 50%;
+    background-repeat: no-repeat;
+    background-size: cover;
+    display: block;
+    grid-column: 1/3;
+    grid-row: 1/3;
+  }
+  #people {
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: auto;
+    grid-column-gap: 50px;
+  }
+  .person {
+    grid-template-rows: 300px auto auto;
+  }
+}
+@media (min-width: 1400px){
+  #image {
+    grid-column: 1/4;
+    background-position: 100% 100%;
+  }
+  #people {
+    grid-template-columns: 50px 3fr 1fr 50px;
+    grid-template-rows: auto;
+    grid-column-gap: 50px
+  }
+}

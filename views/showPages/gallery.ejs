@@ -1,0 +1,443 @@
+<% include ../partials/header %>
+<% if(gallery.NSFW == true && currentUser.nsfw_filter == true){ %>
+<div class="no-nsfw" id="no-nsfw">
+  <h1 class="h3">You've chosen not to see this content</h1>
+  <button type="button" class="sign-up" id="no-nsfw-btn">Show Image</button>
+</div>
+<div class="inactive" id="nsfw-content">
+<% } %>
+<style>
+  #banner {
+    <% if(gallery.image[0].public_url){ %>
+    background-image: linear-gradient(to right, rgba(244, 101, 182, .20), rgba(116, 2, 198, .20)),
+                      url("<%=gallery.image[0].public_url%>");
+    <% } else { %>
+    background-image: linear-gradient(to right, rgba(244, 101, 182, .20), rgba(116, 2, 198, .20)),
+                      url("<%=gallery.image[0].url%>");
+    <% } %>
+  }
+</style>
+<div class="row p-5 justify-content-end text-white" id="banner">
+  <div class="col-12 align-self-end text-white text-md-right text-center ml-auto">
+    <% if(gallery.title){ %>
+    <h1><%=gallery.title%></h1>
+    <% } %>
+    <h2>By: <a id="artist-link" href="/<%=gallery.artist.username%>"><strong><%=gallery.artist.username%></strong></a></h2>
+  </div>
+</div>
+<div class="row justify-content-center">
+    <div class="col-xl-1"></div>
+    <div class="col-10 col-xl-4 mb-5" id="image-card">
+      <% if(gallery.image.length == 1){ %>
+      <div class="card text-center">
+        <% if(gallery.image.mediaType == 'image'){ %>
+        <img class="img-fluid mx-auto" src="<%=gallery.image[0].url%>" alt="<%=gallery.alt_text%>">
+        <% } else if(gallery.image.mediaType == 'audio'){ %>
+        <audio src="<%=gallery.image[0].url%>" controls></audio>
+        <% } else if(gallery.image.mediaType == 'video'){ %>
+        <video src="<%=gallery.image[0].url%>" controls></video> 
+        <% } %>
+      </div>
+      <% } else { %>
+      <div class="multi-image">
+        <button type="button" class="inactive go-btn" id="go-back"><i class="far fa-chevron-left fa-5x text-primary"></i></button>
+        <% for(let file of gallery.image){ %>
+          <% if(gallery.image.indexOf(file) == 0){ %>
+            <% if(file.mediaType == 'image'){ %>
+              <% if(file.public_url){ %>
+        <img src="<%=file.public_url%>" class="file" id="file-<%=gallery.image.indexOf(file)%>" data-index="<%=gallery.image.indexOf(file)%>" alt="<%=gallery.alt_text%>">      
+              <% } else { %>
+        <img src="<%=file.url%>" class="file" id="file-<%=gallery.image.indexOf(file)%>" data-index="<%=gallery.image.indexOf(file)%>" alt="<%=gallery.alt_text%>">        
+              <% } %>
+            <% } else if(file.mediaType == 'audio'){ %>
+        <audio src="<%=file.url%>" class="file" id="file-<%=gallery.image.indexOf(file)%>" data-index="<%=gallery.image.indexOf(file)%>" controls></audio>     
+            <% } else if(file.mediaType == 'video'){ %>
+        <video src="<%=file.url%>" class="file" id="file-<%=gallery.image.indexOf(file)%>" data-index="<%=gallery.image.indexOf(file)%>" controls></video>     
+            <% } %>
+          <% } else { %>
+            <% if(file.mediaType == 'image'){ %>
+              <% if(file.public_url){ %>
+        <img src="<%=file.public_url%>" class="inactive file" id="file-<%=gallery.image.indexOf(file)%>" data-index="<%=gallery.image.indexOf(file)%>" alt="<%=gallery.alt_text%>">      
+              <% } else { %>
+        <img src="<%=file.url%>" class="inactive file" id="file-<%=gallery.image.indexOf(file)%>" data-index="<%=gallery.image.indexOf(file)%>" alt="<%=gallery.alt_text%>">        
+              <% } %>
+            <% } else if(file.mediaType == 'audio'){ %>
+        <audio src="<%=file.url%>" class="inactive file" id="file-<%=gallery.image.indexOf(file)%>" data-index="<%=gallery.image.indexOf(file)%>" controls></audio>     
+            <% } else if(file.mediaType == 'video'){ %>
+        <video src="<%=file.url%>" class="inactive file" id="file-<%=gallery.image.indexOf(file)%>" data-index="<%=gallery.image.indexOf(file)%>" controls></video>
+            <% } %>
+          <% } %>
+        <% } %>
+        <button type="button" class="go-btn" id="go-forward" data-max="<%=gallery.image.length - 1%>"><i class="far fa-chevron-right fa-5x text-primary"></i></button>
+      </div>
+      <% } %>
+    </div>
+    <div class="col-10 col-xl-6 mx-auto my-3 align-self-start text-center text-xl-left">
+      <% if(error && error.length > 0){ %>
+      <div class="container my-3">
+        <div class="alert alert-danger alert-dismissible fade show p-3" role="alert">
+          <div class="container">
+            <strong class="mr-3">Oh no!</strong> <%=error%>
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+              <span aria-hidden="true">
+                <i class="far fa-times"></i>
+              </span>
+            </button>
+          </div>
+        </div>
+      </div>
+      <% } %>
+      <% if(success && success.length > 0){ %> 
+      <div class="container my-3">
+        <div class="alert alert-success alert-dismissible fade show p-3" role="alert">
+          <div class="container text-left">
+            <%=success%>
+            <button type="button" class="close ml-auto" data-dismiss="alert" aria-label="Close">
+              <span aria-hidden="true">
+                <i class="far fa-times"></i>
+              </span>
+            </button>
+          </div>
+        </div>
+      </div>
+      <% } %>
+      <div class="inactive" id="alert-box"></div>
+      <div class="container my-3 inactive" id="fetch-alert">
+        <div class="alert alert-danger alert-dismissible fade show p-3" role="alert">
+          <div class="container">
+            <strong class="mr-3" id="fetch-alert-text">Oh no!</strong>
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+              <span aria-hidden="true">
+                <i class="far fa-times"></i>
+              </span>
+            </button>
+          </div>
+        </div>
+      </div>
+      <% if(currentUser && currentUser._id.toString() == gallery.artist._id.toString() && !gallery.title){ %>
+      <form action="/gallery/<%=gallery.artist.username%>/<%=gallery._id%>/update" method="POST">
+        <div class="card p-4 text-left">
+          <div class="card-header mb-3">
+            <h1 class="text-center">Add some info to your image.</h1>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <div class="col-12">
+                <label for="name" class="col-form-label">Name</label>
+                <input type="text" class="form-control" id="name" name="name" placeholder="Give your piece a name">
+              </div>
+            </div>
+            <div class="row my-3">
+              <div class="col-12">
+                <label for="description" class="col-form-label">Description</label>
+                <textarea maxlength="200" name="description" id="description" class="form-control" placeholder="Tell us all about your awesome creation. You've got 200 characters. "></textarea>
+              </div>
+            </div>
+            <div class="row my-3">
+              <div class="col-12">
+                <div class="form-group">
+                  <label for="alt-text">Tell us what your commission looks like.</label>
+                  <textarea name="alt" id="alt-text" class="form-control" placeholder="Be as descriptive as possible because this is for people who either use screen readers or cannot load images."></textarea>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-12">
+                <label for="tags" class="col-form-label">Tags</label>
+                <input type="text" name="tags" id="tags" class="form-control" placeholder="Add tags with #.">
+              </div>
+            </div>
+            <% function getAge(birthDateString) { %>
+              <% var today = new Date(); %>
+              <% var birthDate = new Date(birthDateString); %>
+              <% var age = today.getFullYear() - birthDate.getFullYear(); %>
+              <% var m = today.getMonth() - birthDate.getMonth(); %>
+              <% if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) { %>
+                <% age--; %>
+              <% } %>
+                <% return age; %>
+            <% } %>
+            <% if(currentUser && getAge(currentUser.birthday) >= 18) { %>
+            <div class="row mt-3">
+              <div class="col-12">
+                <label for="NSFW" class="col-form-label">NSFW</label>
+                <div class="radio" id="NSFW">
+                  <input type="radio" name="commNSFW" value="yes" id="nsfw-yes">
+                  <label for="nsfw-yes" class="mr-3">Yup.</label>
+                  <input type="radio" name="commNSFW" value="no" id="nsfw-no">
+                  <label for="nsfw-no" class="mr-3">Nope.</label>
+                </div>
+              </div>
+            </div>
+            <% } %>
+          </div>
+          <div class="col-12">
+            <button type="submit" class="btn btn-primary btn-block">Save</button>
+          </div>
+      </div>
+      <label for="stop" class="sr-only">Please do not fill this field out. Unless you're a robot.</label>
+      <input type="text" id="stop" name="stop" class="d-none">
+    </form>
+      <% } %>
+      <p class="text-center text-xl-right">
+        <span class="h2"><i class="far fa-binoculars fa-fw mr-3"></i><%=gallery.views%></span>
+        <% if (!currentUser || currentUser._id.toString() == gallery.artist._id.toString()){ %>
+        <span class="h2"><i class="far fa-heart fa-fw ml-5 mr-3 text-danger"></i><%=gallery.likes.length%></span>
+        <% } else { %>
+        <button type="button" class="h2 ml-5" id="like-btn" data-url="/fetch/gallery/<%=gallery.artist.username%>/<%=gallery._id%>/like" data-likes="<%=gallery.likes.length%>">
+          <% if(gallery.likes.includes(currentUser._id.toString())){ %>
+          <i class="fas fa-heart fa-fw mr-3 text-danger" id="like-icon"></i>
+          <% } else { %>
+          <i class="far fa-heart fa-fw mr-3 text-danger" id="like-icon"></i>
+          <% } %>
+          <span id="like-number"><%=gallery.likes.length%></span>
+        </button>
+        <% } %>
+        <% if(currentUser && currentUser._id.toString() == gallery.artist._id.toString()){ %>
+        <button type="button" class="h2 ml-5" id="edit-btn" data-id="<%=gallery._id%>" data-toggle="modal" data-target="#edit-modal">
+          <i class="far fa-edit fa-fw"></i>
+        </button>
+        <button type="button" class="h2 ml-3" data-toggle="modal" data-target="#delete-modal">
+          <i class="far fa-trash-alt fa-fw mr-3 text-danger"></i>
+        </button>
+        <% } %>
+      </p>
+      <% if(gallery.description){ %>
+      <h1 class="h3">What <%=gallery.artist.username%> Says:</h1>
+      <p><%=gallery.description%></p>
+      <% } %>
+      <% if(gallery.tags.length > 0){ %>
+      <div class="row align-items-center">
+        <div class="col-12 col-xl-2 text-center">
+          <i class="fas fa-tags text-primary fa-3x my-5 my-xl-0"></i>
+        </div>
+        <div class="col-12 col-xl-10" id="tag-area">
+          <% gallery.tags.forEach((tag)=>{ %>
+          <%if(tag.length > 0){ %>
+            <a href="/search?q=<%=tag%>" class="tag">
+              #<%=tag%>
+            </a>
+          <% } %>
+          <% }); %>
+        </div>
+      </div>
+      <% } %>
+      <div class="row mt-3">
+        <div class="col-12">
+          <h1 class="text-center text-lg-left h3" id="comments">What People Are Saying: <br class="d-lg-none"><span class="mx-3 mt-3 mt-lg-0"><%=gallery.comments.length%></span>
+            <% if(gallery.comments.length == 1) { %>
+            Comment
+            <% } else { %>
+            Comments
+            <% } %>
+          </h1>
+        </div>
+      </div>
+      <div class="row mt-3">
+        <div class="col-12">
+          <% if(currentUser){ %>
+          <div class="media media-post">
+            <div class="pull-left author">
+              <%if(currentUser.profile.url){ %>
+              <div class="avatar">
+              <img class="media-object img-raised" alt="64x64" src="<%=currentUser.profile.url%>">
+              </div>
+              <% } else { %>
+              <i class="far fa-user fa-4x" data-fa-transform="down-3 left-3"></i>
+              <% } %>
+            </div>
+            	<div class="media-body">
+            	  <form action="/gallery/<%=gallery.artist.username%>/<%=gallery._id%>/comment" method="POST">
+            		  <textarea class="form-control" name="comment" placeholder="Play nice or we'll ban you." rows="4"></textarea>
+            			<div class="media-footer text-right">
+            				<button type="submit" class="btn btn-primary pull-right">
+            					<i class="now-ui-icons ui-1_send mr-3"></i> Comment
+            				</button>
+            			</div>
+            		</form>
+            	</div>
+            </div>
+  				<% } else { %>
+  				<a class="h3" href="/login">Please login to comment.</a>
+  				<% } %>
+        </div>
+      </div>
+      <%if(gallery.comments.length > 0){ %>
+      <div class='row mt-3' id="comments-zone">
+        <% gallery.comments.forEach((comment)=>{ %>
+        <div class="col-12 text-left" id="<%=comment._id%>"> 
+          <div class="media">
+					  <a class="pull-left" href="/<%=comment.from.username%>">
+						  <%if(comment.from.profile.url){ %>
+              <div class="avatar">
+              <img class="media-object img-raised" alt="64x64" src="<%=comment.from.profile.url%>">
+              </div>
+              <% } else { %>
+              <i class="far fa-user fa-4x" data-fa-transform="down-3 left-3"></i>
+              <% } %>
+					  </a>
+					  <div class="media-body">
+							<h5 class="media-heading"><%=comment.from.username%> <small class="text-muted">· <%=comment.date.toDateString()%></small></h5>
+							<p><%=comment.content%>
+							</p>
+							<div class="media-footer text-right">
+								<% if(!currentUser || comment.from._id.toString() == currentUser._id.toString()){ %>
+								<span>
+									<i class="far fa-heart text-danger"></i> <%=comment.likes.length%>
+								</span>
+								<% } else { %>
+								<form class="d-inline" action="/gallery/<%=gallery.artist.username%>/<%=gallery._id%>/comment/<%=comment._id%>/like" method="POST">
+  								<button type="submit" class="btn btn-neutral pull-right comment-like" data-url="/fetch/gallery/<%=gallery.artist.username%>/<%=gallery._id%>/comment/<%=comment._id%>/like" data-id="<%=comment._id%>" data-likes="<%=comment.likes.length%>" id="<%=comment._id.toString()%>-like-submit">
+  								  <% if(comment.likes.indexOf(currentUser._id) != -1){ %>
+  								  <i class="fas fa-heart text-danger" id="<%=comment._id%>-like-icon"></i>
+  								  <% } else { %>
+  									<i class="far fa-heart text-danger" id="<%=comment._id%>-like-icon"></i>
+  									<% } %>
+  									<span id="<%=comment._id%>-like-span"><%=comment.likes.length%></span>
+  								</button>
+								</form>
+								<% } %>
+								<% if(currentUser){ %>
+								<form action="/gallery/<%=gallery.artist.username%>/<%=gallery._id%>/comment/<%=comment._id%>/report" method="POST" class="d-inline">
+  								<button type="submit" class="btn btn-danger btn-neutral pull-right">
+  									Report
+  								</button>
+								</form>
+								<% } %>
+								<% if(currentUser && currentUser._id.equals(comment.from._id)){ %>
+								<form action="/gallery/<%=gallery.artist.username%>/<%=gallery._id%>/comment/<%=comment._id%>/remove" method="POST" class="d-inline">
+								  <button type="submit" class="btn btn-danger">
+									  <i class="far fa-trash-alt mr-3"></i> Delete
+									</button>
+								</form>
+								<% } %>
+							</div>
+					  </div>
+				  </div>
+				</div>
+				<% }); %>
+      </div>
+      <% } %>
+    </div>
+  </div>
+<% if(gallery.NSFW == true && currentUser.nsfw_filter == false){ %>
+</div>
+<% } %>
+<% if(currentUser && currentUser._id.toString() == gallery.artist._id.toString()){ %>
+<div class="modal fade" id="edit-modal" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Edit <%=gallery.title%></h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="spinner inactive" id="edit-spinner">
+          <div class="double-bounce1"></div>
+          <div class="double-bounce2"></div>
+        </div>
+        <form id="edit-form">
+          <input type="hidden" id="id" value="<%=gallery._id%>">
+          <div class="upload span-2" data-multiple="true">
+            <i class="far fa-cloud-upload-alt fa-5x"></i>
+            <p>Drag your images here or click the button to upload. You can upload a max of 10 images that are each under 10MB</p>
+            <div class="multiple">
+              <% for(let img of gallery.image){ %>
+              <img class="preview-image prior-image" src="<%=img.url%>" data-index="<%=gallery.image.indexOf(img)%>">
+              <% } %>
+            </div>
+            <label for="edit-input" class="btn btn-simple btn-sm">Upload</label>
+            <input type="file" id="edit-input" name="images" class="d-none ref-input img-input" accept="image/*" multiple>
+            <p class="preview-instructions">Click on an image to remove it.</p>
+          </div>
+          <div class="form-group span-2">
+            <label for="title">Title<span class="text-danger ml-1">*</span></label>
+            <input type="text" class="form-control" id="title" placeholder="Give Your Piece A Title" required value="<%=gallery.title%>">
+          </div>
+          <div class="form-group span-2">
+            <label for="description">Description<span class="text-danger ml-1">*</span></label>
+            <textarea maxlength="200" class="form-control" id="description" placeholder="Tell Us All About Your Creation. Keep It Under 200 Characters." required><%=gallery.description%></textarea>
+          </div>
+          <div class="form-group span-2">
+            <label for="alt">Alt Text<span class="text-danger ml-1">*</span></label>
+            <textarea class="form-control" id="alt" placeholder="Be as descriptive as possible because this is for people who either use screen readers or cannot load images." required><%=gallery.alt_text%></textarea>
+          </div>
+          <div class="form-group span-2">
+            <label for="tags">Tags</label>
+            <input type="text" class="form-control" id="tags" placeholder="Separate Each With a #" value="<%=gallery.tags.join(' #')%>">
+          </div>
+          <div class="form-group pr-3">
+            <label for="type">Commission Type<span class="text-danger ml-1">*</span></label>
+            <select class="custom-select" id="type">
+              <option selected disabled value="">Select Type</option>
+              <!--<option value="animation">Animation</option>-->
+                <option value="comic">Comic</option>
+                <option value="craft">Craft</option>
+                <option value="digital">Digital Art</option>
+                <option value="graphic_design">Graphic Design</option>
+                <!--<option value="fiction">Fiction</option>-->
+                <!--<option value="film">Film</option>-->
+                <!--<option value="non-fiction">Non-Fiction</option>-->
+                <option value="photo">Photo</option>
+                <!--<option value="poetry">Poetry</option>-->
+                <option value="traditional">Traditional Art</option>
+            </select>
+          </div>
+          <% if(age == true){ %>
+          <div class="form-group">
+            <label for="nsfw">NSFW</label>
+            <div class="radio" id="nsfw">
+              <input type="radio" name="NSFW" value="yes" id="nsfw-yes">
+              <label for="nsfw-yes" class="mr-3">Yup.</label>
+              <input type="radio" name="NSFW" value="no" id="nsfw-no">
+              <label for="nsfw-no" class="mr-3">Nope.</label>
+            </div>
+          </div>
+          <% } %>
+          <div class="form-group span-2">
+            <label for="edit-mods">Modifications</label>
+            <div id="edit-mods">
+              <div class="checkbox">
+                <input type="checkbox" name="watermark" value="watermark" id="watermark">
+                <label class="text-white" for="watermark">Add Splatr Watermark</label>
+              </div>
+              <div class="checkbox">
+                <input type="checkbox" name="downscale" value="downscale" id="downscale">
+                <label for="downscale">Downscale Image</label>
+              </div>
+            </div>
+          </div>
+          <label for="honey" class="sr-only">Please don't fill this out. It's just to catch bots.</label>
+          <input type="text" class="d-none" id="honey">
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Nevermind</button>
+        <button type="button" class="btn btn-success" id="edit-submit">Save changes</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal fade" id="delete-modal" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Delete <%=gallery.title%></h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p>Are you sure? We're not like some places that will keep your stuff for a while. Nope. Click that delete button and this whole piece and everything attached to it is gone from Splatr.</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Nevermind</button>
+        <button type="button" class="btn btn-danger" id="delete-btn" data-id="<%=gallery._id%>" data-artist="<%=gallery.artist.username%>">Delete Forever</button>
+      </div>
+    </div>
+  </div>
+</div>
+<% } %>
+<% include ../partials/footer %>

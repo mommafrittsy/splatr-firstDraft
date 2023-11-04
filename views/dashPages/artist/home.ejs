@@ -1,0 +1,235 @@
+<section id="home">
+  <% if(missingInfo == true){ %>
+  <article class="block" id="missing-info">
+    <h2 class="block-name"><i class="far fa-question-circle fa-lg fa-fw"></i> Missing Info</h2>
+    <p>It seems we're missing some information before you can become an artist.</br>Please make sure all the fields below are filled.</p>
+    <form method="POST" action="/dash/user/missing_info" id="missing-info-form">
+      <div class="form-row">
+        <div class="form-group col-md-6">
+          <label for="given-name">Given Name <span class="text-danger">*</span></label>
+          <input type="text" class="form-control" id="given-name" name="givenName" value="<%=currentUser.name.given%>" required>
+        </div>
+        <div class="form-group col-md-6">
+          <label for="surname">Surname <span class="text-danger">*</span></label>
+          <input type="text" class="form-control" id="surname" name="surname" value="<%=currentUser.name.surname%>" required>
+        </div>
+      </div>
+      <%if(!currentUser.birthday){ %>
+      <div class="form-group">
+        <label for="birthdate">Birthdate <span class="text-danger">*</span></label>
+        <input type="date" class="form-control" id="birthdate" name="birthdate">
+      </div>
+      <% } else { %>
+      <input type="hidden" name="birthdate" value="<%=currentUser.birthday%>">
+      <% } %>
+      <div class="form-row">
+        <div class="form-group col-md-12">
+          <label for="street">Street <span class="text-danger">*</span></label>
+          <input type="text" class="form-control" id="street" name="street" value="<%=currentUser.address.line1%>" required>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group col-md-12">
+          <label for="suite">Apartment / Suite</label>
+          <input type="text" class="form-control" id="suite" name="suite" value="<%=currentUser.address.line2%>">
+        </div>
+      </div>
+      <%if(['AU','CA','US'].includes(currentUser.address.country.code)){%>
+      <div class="form-row">
+        <div class="form-group col-md-4">
+          <label for="city">City <span class="text-danger">*</span></label>
+          <input type="text" class="form-control" id="city" name="city" value="<%=currentUser.address.city%>">
+        </div>
+        <div class="form-group col-md-4">
+          <label for="state">State <span class="text-danger">*</span></label>
+          <select class="custom-select w-100" id="state" name="state">
+            <% if(currentUser.address.state.code){ %>
+            <option selected value="<%=currentUser.address.state.code%>"><%=currentUser.address.state.name%></option>
+            <% } %>
+            <% let stateKeys = Object.keys(states[currentUser.address.country.code.toUpperCase()]);%>
+            <% for(let key of stateKeys){ %>
+            <option value="<%=key%>"><%=states[currentUser.address.country.code.toUpperCase()][key]%></option>
+            <% } %>
+          </select>
+        </div>
+        <div class="form-group col-md-4">
+          <label for="post">Postcode <span class="text-danger">*</span></label>
+          <input type="text" class="form-control" id="post" name="post" value="<%=currentUser.address.post%>">
+        </div>
+      </div>
+      <% } else { %>
+      <div class="form-row">
+        <div class="form-group col-md-6">
+          <label for="city">City <span class="text-danger">*</span></label>
+          <input type="text" class="form-control" id="city" name="city" value="<%=currentUser.address.city%>">
+        </div>
+        <div class="form-group col-md-6">
+          <label for="post">Postcode <span class="text-danger">*</span></label>
+          <input type="text" class="form-control" id="post" name="post" value="<%=currentUser.address.post%>">
+        </div>
+      </div>
+      <% } %>
+      <p class="text-center"><small>By registering for an artist account, you agree to our <a href='/legal/tos' class="text-info">Terms of Service Agreement</a> and the <br> <a href="https://stripe.com/us/connect-account/legal" class="text-info">Stripe Connected Account Agreement</a>.</small></p>
+      <input type="hidden" name="country" value="<%=currentUser.address.country.code%>">
+      <button type="submit" class="btn btn-info btn-sm btn-block" form="missing-info-form">Update</button>
+    </form>
+  </article>
+  <% } %>
+  <% if(user.stripe.fields_needed.length > 0 || user.verified.verified == false){ %>
+  <article class="block" id="verification">
+    <h2 class="block-name"><i class="far fa-check-circle fa-lg fa-fw"></i> Verify Information</h2>
+    <%if(user.verified.verified == false){ %>
+    <button type="button" class="verify" id="email-verify">
+      <i class="fal fa-envelope fa-3x"></i>
+      <p>Resend Verification Email</p>
+    </button>
+    <% } %>
+    <% if(user.stripe.fields_needed.includes('legal_entity.verification.document')){ %>
+    <button type="button" class="verify" data-toggle="modal" data-target="#id-modal">
+      <i class="fal fa-address-card fa-3x"></i>
+      <p>Upload ID</p>
+    </button>
+    <% } %>
+    <% if(user.stripe.fields_needed.includes('legal_entity.ssn_last_4')|| user.stripe.fields_needed.includes('legal_entity.verification.personal_id_number')){%>
+      <button type="button" class="verify" data-toggle="modal" data-target="#pid-modal">
+        <i class="fal fa-user fa-3x"></i>
+        <p>ID Number</p>
+      </button>
+    <% } %>
+  </article>
+  <% } %>
+  <article class="block" id="working-on">
+    <h2 class="block-name"><i class="far fa-person-carry fa-lg fa-fw"></i> Working On</h2>
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>Client</th>
+          <th>Status</th>
+          <th>Activity Date</th>
+        </tr>
+      </thead>
+      <tbody>
+        <%for (let transaction of user.transactions){ %>
+          <% if(transaction.client && !['requested','declined','closed'].includes(transaction.status)){ %>
+        <tr>
+          <td><a href="/<%=transaction.client.username%>"><%=transaction.client.username%></a></td>
+          <td><a href="/transaction/<%=transaction._id%>"><%=transaction.status.substring(0,1).toUpperCase() + transaction.status.substring(1)%></a></td>
+          <td><a href="/transaction/<%=transaction._id%>"><%=datify(transaction.dates.activity, "US")%></a></td>
+        </tr>
+          <% } %>
+        <% } %>
+      </tbody>
+    </table>
+  </article>
+  <article class="block" id="requests">
+    <h2 class="block-name"><i class="far fa-mail-bulk fa-lg fa-fw"></i>Requests</h2>
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>Client</th>
+          <th>Commission Type</th>
+          <th>Request Date</th>
+        </tr>
+      </thead>
+      <tbody>
+        <%for(let request of user.transactions){ %>
+          <% if(request.client && request.status == "requested"){ %>
+        <tr>
+          <td><a href="/<%=request.client.username%>"><%=request.client.username%></a></td>
+          <td><a href="/transaction/<%=request._id%>"><%=request.type.name%></a></td>
+          <td><a href="/transaction/<%=request._id%>"><%=datify(request.dates.request, "US")%></a></td>
+        </tr>
+          <% } %>
+        <% } %>
+      </tbody>
+    </table>
+  </article>
+  <% if(user.stripe.fields_needed.includes('legal_entity.verification.document')){ %>
+  <div class="modal fade" id="id-modal" tabindex="-1" role="dialog" aria-labelledby="id-label" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="id-label">Upload Verification Document</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true"><i class="far fa-times text-danger"></i></span>
+          </button>
+        </div>
+        <div class="modal-body text-center">
+          <div class="spinner inactive" id="id-spinner">
+            <div class="double-bounce1"></div>
+            <div class="double-bounce2"></div>
+          </div>
+          <form id="id-form">
+            <p><small>Verification Documents need to be uploaded in color as a JPEG or PNG that is smaller than 5MB. If you need to provide the front and back of the ID, please select the front first and then the back.</small></p>
+            <% let country = currentUser.address.country.code.toLowerCase();%>
+            <% if(['au','at','ca','fr','nl','sg'].includes(country)){%>
+            <p><small>While a Passport is always preferred, acceptable forms of ID are a Passport, Government-Issued ID (Front and Back), or a Driver's License (Front and Back).</small></p>
+            <% } else if(['dk','fi','de','ie','it','lu','pt','es','ch','uk'].includes(country)){ %>
+            <p><small>While a Passport is always preferred, acceptable forms of ID are a Passport, Government-Issued ID (Front and Back), or a Driver's License.</small></p>
+            <% } else if(country == 'be'){ %>
+            <p><small>While a Passport is always preferred, acceptable forms of ID are a Passport, Government-Issued ID, or a Driver's License.</small></p>
+            <% } else if(country == 'hk'){ %>
+            <p><small>While a Passport is always preferred, you can also upload a Government-Issued ID.</small></p>
+            <% } else if(country == 'no'||country == 'se'||country == 'nz'){ %>
+            <p><small>While a Passport is always preferred, you can also upload a Driver's License (Front and Back in New Zealand).</small></p>
+            <% } else if(country.toLowerCase() == 'us'){ %>
+            <p><small>While a Passport is always preferred, acceptable forms of ID are a Passport, Government-Issued ID, or a Driver's License (Front and Back).</small></p>
+            <% } else if(country == 'jp'){ %>
+            <p><small>While a Passport is always preferred, acceptable forms of ID are a Passport, Juki card(with Photo; Front and Back), Driver's License (Front and Back), Foreign Nationals Residence Card (Front and Back), or Health Insurance Card with Certificate of Residence or National Pension Notebook.</small></p>
+            <% } %>
+            <div class="upload" id="id-upload" data-multiple="true">
+              <i class="far fa-cloud-upload-alt fa-5x"></i>
+              <p>Drag your ID images here or click the button to upload.</p>
+              <div class="multiple" id="id-images"></div>
+              <label for="id-input" id="ref-label" class="btn btn-simple btn-sm">Upload</label>
+              <input type="file" id="id-input" name="images" class="d-none img-input" accept="image/*" multiple>
+              <p class="preview-instructions">Click on an image to remove it.</p>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary btn-sm submit-img-btn mx-auto" id="id-submit" data-type="id" data-spinner="id-spinner" data-form="id-form">Submit ID</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <% } %>
+  <% if(user.stripe.fields_needed.includes('legal_entity.personal_id_number')||user.stripe.fields_needed.includes('legal_entity.ssn_last_4')){ %>
+  <div class="modal fade" id="pid-modal" tabindex="-1" role="dialog" aria-labelledby="id-label" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="pid-label">Identification Number</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true"><i class="far fa-times text-danger"></i></span>
+          </button>
+        </div>
+        <div class="modal-body text-center">
+          <div class="spinner inactive" id="pid-spinner">
+            <div class="double-bounce1"></div>
+            <div class="double-bounce2"></div>
+          </div>
+          <form id="pid-form">
+            <div class="form-group">
+              <%if(currentUser.address.country.code == 'US'){ %>
+              <label for="pid-input">Social Security Number (without dashes)</label>
+              <% } else if(currentUser.address.country.code == 'CA'){ %>
+              <label for="pid-input">Social Insurance Number</label>
+              <% } else if(currentUser.address.country.code == 'HK'){ %>
+              <label for="pid-input">Identity Card Number</label>
+              <% } else if(currentUser.address.country.code == 'SG'){ %>
+              <label for="pid-input">National Registration Identity Card (NRIC) or Foreign Identification Number (FIN)</label>
+              <% } %>
+              <p><small>We do not save this information, but Stripe does.</small></p>
+                <input type="text" class="form-control" id="pid-input" name="pid" autocomplete="off">
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary btn-sm submit-img-btn mx-auto" id="id-submit" data-type="id" data-spinner="id-spinner" data-form="id-form">Submit ID</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <% } %>
+</section>

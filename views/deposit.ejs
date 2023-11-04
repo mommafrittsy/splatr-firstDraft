@@ -1,0 +1,140 @@
+<% include partials/header%>
+<div class="row my-5 justify-content-center">
+  <div class="col-10 col-md-8">
+    <div class="card">
+      <div class="card-header" id="payment-header">
+        <h1 class="h2 mb-3">Place Deposit</h1>
+      </div>
+      <div class="card-body">
+        <div class="row justify-content-center spinner inactive" id="spinner" data-hide="before-payment" data-show="after-payment">
+          <div class="double-bounce1"></div>
+          <div class="double-bounce2"></div>
+        </div>
+        <div class="row justify-content-center" id="before-payment">
+          <div class="col-12 col-xl-4" id="invoice">
+            <div class="row">
+              <% if(trans.type.example.mediaType == 'image'){ %>
+              <div class="col-12 comm-example" style="background-image:url('<%=trans.type.example%>')"></div>
+              <% } else if (trans.type.mediaType == 'video'){ %>
+              <video src="<%=trans.type.example%>" controls></video>
+              <% } else if (trans.type.mediaType == 'audio'){ %>
+              <audio src="<%=trans.type.example%>" controls ></audio>
+              <% } %>
+            </div>
+            <h2 class="text-center" id="commission-name"><%=trans.type.name%></h2>
+            <div class="row">
+              <div class="col-6">
+                <p>Full Price</p>
+              </div>
+              <div class="col-6 text-right">
+                <p id="commission-full-price">$<%=(trans.type.price/100).toFixed(2)%></p>
+              </div>
+            </div>
+            <hr>
+            <div class="row">
+              <div class="col-6">
+                <p><strong>Total Deposit Due Now<i class="far fa-map-marker-question ml-2" data-placement="right" data-toogle="tooltip" title="Why do I have to make a deposit?
+                This lets the artist know that you are ready to move forward and locks both parties into the deal.
+                They’ll get a notification and start working on the commission straight away."></i></strong></p>
+              </div>
+              <div class="col-6 text-right">
+                <p><strong>$<%=((trans.type.price/100)/2).toFixed(2)%></strong></p>
+              </div>
+            </div>
+            <button type="button" class="btn btn-primary btn-block btn-lg switch" data-show="payment" data-hide="deposit-submit" id="deposit-submit">Place Deposit</button>
+          </div>
+          <div class="col-12 col-xl-8 inactive text-center" id="payment">
+            <p>We accept most major credit cards!</p>
+            <p>
+              <i class="fab fa-cc-visa fa-2x mr-3 fa-fw"></i>
+              <i class="fab fa-cc-mastercard fa-2x mr-3 fa-fw"></i>
+              <i class="fab fa-cc-amex fa-2x mr-3 fa-fw"></i>
+              <i class="fab fa-cc-discover fa-2x mr-3 fa-fw"></i>
+              <i class="fab fa-cc-jcb fa-2x mr-3 fa-fw"></i>
+              <i class="fab fa-cc-diners-club fa-2x mr-3  fa-fw"></i>
+            </p>
+            <% if(cards){ %>
+            <% if(cards.length > 0){ %>
+            <button type="button" class="btn btn-info switch" data-show="saved-card" data-hide="new-card">Use a Saved Card</button>
+            <button type="button" class="btn btn-info switch" data-show="new-card" data-hide="saved-card">Add a Card</button>
+            <div class="inactive" id="saved-card">
+              <form class="p-3 text-center" id="saved-card-form">
+                <%for(let card of cards){ %>
+                  <button type="button" class="btn btn-light card-btn" id="<%=card.id%>">
+                    <%if(card.brand.toLowerCase() == 'american express'){%>
+                    <i class="fab fa-cc-amex fa-lg mr-3" ></i>
+                    <% } else if(card.brand == 'Diners Club'){ %>
+                    <i class="fab fa-cc-diners-club fa-lg mr-3"></i>
+                    <% } else { %>
+                    <i class="fab fa-cc-<%=card.brand.toLowerCase()%> fa-lg mr-3" ></i>
+                    <% } %>
+                    ****<%=card.last4%></button>
+                <% } %>
+                <button type="button" class="btn btn-primary btn-block btn-lg mt-3" id="saved-card-submit" data-type="<%=trans.type.id%>" data-trans="<%=trans._id%>" data-url="deposit">Place Deposit</button>
+              </form>
+            </div>
+            <div class="inactive" id="new-card">
+            <% } %>
+            <% } %>
+              <form class="p-3 text-left" id="new-card-form">
+                <div class="form-group">
+                  <label for="cc-name">Name on Card</label>
+                  <input type="text" class="form-control" id="cc-name">
+                </div>
+                <div class="form-group">
+                  <label for="card-element">
+                    Credit or Debit Card
+                  </label>
+                  <div id="card-element">
+                    <!-- A Stripe Element will be inserted here. -->
+                  </div>
+                </div>
+								<div class="checkbox">
+                  <input id="save-card" type="checkbox">
+                  <label for="save-card">
+                    Save Card
+                  </label>
+                </div>
+                <button type="button" class="btn btn-primary btn-block btn-lg mt-3" id="new-card-submit" data-type="<%=trans.type.id%>" data-trans="<%=trans._id%>"  data-url="deposit">Place Deposit</button>
+              </form>
+            <% if(cards && cards.length > 0){ %>
+            </div>
+            <% } %>
+            <!-- Used to display form errors. -->
+            <div class="text-danger" id="card-errors" role="alert"></div>
+            <input type="hidden" id="customer-account" value="<%=client.stripe.customerID%>">
+            <input type="hidden" id="artist-account" value="<%=artist.stripe.id%>">
+          </div>
+        </div>
+      </div>
+      <div class="row justify-content-center inactive text-center" id="after-payment">
+          <div class="col-12 col-md-10 col-xl-6">
+            <div class="row">
+              <div class="col-12 p-3 bg-primary mb-3">
+                <h2 class="text-white mb-0">Receipt</h2>
+              </div>
+              <div class="col-12">
+                <p class="text-muted"><small>Completed On: <span id="time"></span></small></p>
+              </div>
+              <div class="col-12">
+                <hr>
+              </div>
+              <div class="col-12 col-md-6">
+                <p>Deposit on <%=trans.type.name%></p>
+                <p id="charge-amount"></p>
+              </div>
+              <div class="col-12 col-md-6">
+                <p>Payment Method</p>
+                <p><i class="fab fa-4x" id="card-icon"></i><span class="ml-3"></span>****<span id="card-span"></span></p>
+              </div>
+            </div>
+            <p><small class="text-muted">Transaction ID: <span id="charge-id"></span></small></p>
+            <a href="/transaction/<%=trans._id%>" class="btn btn-primary btn-block btn-lg mb-0">
+              Go Back to Transaction
+            </a>
+          </div>
+        </div>
+    </div>
+  </div>
+</div>
+<% include partials/footer%>

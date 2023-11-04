@@ -1,0 +1,407 @@
+<section class="inactive" id="settings">
+  <div class="modal fade" id="crop-modal" tabindex="-1" role="dialog" aria-labelledby="crop-modal-label" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="crop-modal-label"></h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div id="crop-upload">
+            <i class="far fa-cloud-upload-alt fa-5x to-hide"></i>
+            <p class="to-hide">Drag your image here or click the button to upload.</p>
+            <div class="cropper-div">
+              <img>
+            </div>
+            <div class="to-hide inactive" id="crop-preview"></div>
+            <label for="crop-input" id="crop-label" class="btn btn-simple btn-sm to-hide">Upload</label>
+            <input type="file" id="crop-input" name="images" class="d-none ref-input crop-input" accept="image/*">
+            <button type="button" id="crop-submit" class="btn btn-primary btn-sm to-hide inactive">Crop & Submit</button>
+          </div>
+          <div class="spinner inactive" id="crop-spinner">
+            <div class="double-bounce1"></div>
+            <div class="double-bounce2"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <article class="block" id="settings-tools">
+    <h2 class="block-name"><i class="fal fa-cog fa-lg fa-fw"></i>Account Settings</h2>
+    <button type="button" class="btn btn-block text-left" data-toggle="collapse" data-target="#profile" aria-expanded="false" aria-controls="profile">
+      <i class="far fa-paint-brush fa-lg mr-3"></i>
+      Profile and Personalization
+    </button>
+    <button type="button" class="btn btn-block text-left" data-toggle="collapse" data-target="#login" aria-expanded="false" aria-controls="login">
+      <i class="far fa-sign-in-alt fa-lg mr-3"></i>
+      Sign In
+    </button>
+    <button type="button" class="btn btn-block text-left" data-toggle="collapse" data-target="#personal" aria-expanded="false" aria-controls="personal">
+      <i class="far fa-user fa-lg mr-3"></i>
+      Personal
+    </button>
+    <button type="button" class="btn btn-block text-left" data-toggle="collapse" data-target="#address" aria-expanded="false" aria-controls="address">
+      <i class="far fa-envelope fa-lg mr-3"></i>
+      Address
+    </button>
+    <button type="button" class="btn btn-block text-left" data-toggle="collapse" data-target="#social-accounts" aria-expanded="false" aria-controls="social-accounts">
+      <i class="far fa-share-alt fa-lg mr-3"></i>
+      Social Accounts
+    </button>
+    <button type="button" class="btn btn-block text-left" data-toggle="collapse" data-target="#delete-account" aria-expanded="false" aria-controls="delete-account">
+      <i class="far fa-trash-alt fa-lg mr-3"></i>
+      Delete Account
+    </button>
+  </article>
+  <div id="settings-options">
+    <article class="block collapse show" id="profile">
+      <h2 class="block-name"><i class="fal fa-paint-brush fa-lg fa-fw"></i>Profile and Personalization</h2>
+      <div id="crop-blocks">
+        <h3>Profile Picture</h3>
+        <% if(user.profile.url){ %>
+        <img class="crop-modal-btn" src="<%=user.profile.url%>" alt="Your profile picture." data-name="profile" data-ratio="1/1">
+        <p><small>Click to Change</small></p>
+        <% } else {  %>
+        <button type="button" class="btn btn-primary btn-sm crop-modal-btn mx-auto" data-name="profile" data-ratio="1/1">Upload Profile Picture</button>
+        <% } %>
+        <h3>Banner Picture</h3>
+        <% if(user.banner.url){ %>
+        <img class="crop-modal-btn" src="<%=user.banner.url%>" alt="Your banner picture." data-name="banner" data-ratio="16/9">
+        <p><small>Click to Change</small></p>
+        <% } else { %>
+        <button type="button" class="btn btn-primary btn-sm crop-modal-btn mx-auto" data-name="banner" data-ratio="16/9">Upload Banner Picture</button>
+        <% } %>
+      </div>
+      <div>
+        <label for="bio">Bio</label>
+        <textarea class="form-control details" id="bio" max="150" placeholder="Let us know who you are! You've got 150 characters" autocomplete="off"><%=currentUser.description%></textarea>
+        <div class="detail-buttons" id="bio-btns">
+          <button type="button" class="btn btn-secondary btn-sm detail-cancel" data-previous="<%=currentUser.description%>" data-type="bio">Cancel</button>
+          <button type="button" class="btn btn-success btn-sm detail-save" data-type="bio">Save</button>
+        </div>
+        <label class="mt-3 d-block" for="motto">What's Your Motto</label>
+        <textarea class="form-control details" id="motto" max="75" placeholder="Give us your best one-liner. 75 Characters." autocomplete="off"><%=currentUser.motto%></textarea>
+        <div class="detail-buttons" id="motto-btns">
+          <button type="button" class="btn btn-secondary btn-sm detail-cancel" data-previous="<%=currentUser.motto%>" data-type="motto">Cancel</button>
+          <button type="button" class="btn btn-success btn-sm detail-save" data-type="motto">Save</button>
+        </div>
+        <label for="tags-input" class="mt-3">What's Your Style?</label>
+        <div id="tags">
+          <%for(let tag of user.style){ %>
+          <span class="badge badge-success my-2 ml-2"><%=tag%><span class="ml-2" onclick="removeTag(this)">
+              <i class="fal fa-times"></i>
+            </span>
+          </span>
+          <% } %>
+        </div>
+        <div class="input-group">
+          <span class="input-group-prepend">
+            <span class="input-group-text">
+              <i class="fas fa-tags text-secondary fa-lg fa-fw"></i>
+            </span>
+          </span>
+          <input type="text" class="form-control" id="tags-input" placeholder="Tag Your Style. Separate Tags with #">
+        </div>
+      </div>
+      <div>
+        <h3>Dashboard Background</h3>
+        <div id="background-btns">
+          <button type="button" class="background-btn"></button>
+          <button type="button" class="background-btn"></button>
+          <button type="button" class="background-btn" style="background-image:url('https://ayizan.blob.core.windows.net/site-images/Seattle.jpeg')">
+          </button>
+          <button type="button" class="background-btn" style="background-image:url('https://ayizan.blob.core.windows.net/site-images/Paint Pallette.jpeg')">
+          </button>
+          <button type="button" class="background-btn" style="background-image:url('https://ayizan.blob.core.windows.net/site-images/Melbourne Small.jpg')">
+          </button>
+          <button type="button" class="background-btn" style="background-image:url('https://ayizan.blob.core.windows.net/site-images/BFs at Sunset.jpeg')">
+          </button>
+          <button type="button" class="background-btn" style="background-image:url('https://ayizan.blob.core.windows.net/site-images/Backpacker w- camera.jpeg')">
+          </button>
+        </div>
+      </div>
+    </article>
+    <article class="block collapse" id="login">
+      <h2 class="block-name"><i class="fal fa-sign-in-alt fa-lg fa-fw"></i>Sign In</h2>
+      <div class="spinner inactive" id="login-spinner">
+        <div class="double-bounce1"></div>
+        <div class="double-bounce2"></div>
+      </div>
+      <form>
+        <div class="form-group">
+          <label for="username">Username</label>
+          <span class="badge badge-danger ml-3" id="taken-badge"></span>
+          <span class="badge badge-success ml-3" id="free-badge"></span>
+          <input type="text" class="form-control" id="username" name="username" min="4" value="<%=user.username%>">
+        </div>
+        <div class="form-group">
+          <label for="change-email">Email</label>
+          <input type="email" class="form-control" id="email" name="email" value="<%=user.email%>">
+        </div>
+        <div class="checkbox">
+          <%if (user.marketingEmails == true){ %>
+          <input id="marketing" name="marketing" type="checkbox" checked>
+          <% } else { %>
+          <input id="marketing" name="marketing" type="checkbox">
+          <% } %>
+          <label for="marketing">
+            Receiving Marketing Emails
+          </label>
+          <small> (We won't spam you, promise.)</small>
+        </div>
+        <button type="button" class="btn btn-sm btn-primary submit-button" id="login-submit" data-name="login">Update</button>
+      </form>
+    </article>
+    <article class="block collapse" id="personal">
+      <h2 class="block-name"><i class="fal fa-user-alt fa-lg fa-fw"></i>Personal</h2>
+      <div class="spinner inactive" id="personal-spinner">
+        <div class="double-bounce1"></div>
+        <div class="double-bounce2"></div>
+      </div>
+      <form id="personal-form">
+        <div class="form-row">
+          <div class="form-group col-md-6">
+            <label for="firstName" class="col-form-label">Given Name</label>
+            <input type="text" class="form-control" id="given" name="given" value="<%=user.name.given%>">
+          </div>
+          <div class="form-group col-md-6">
+            <label for="lastName" class="col-form-label">Surname</label>
+            <input type="text" class="form-control" id="surname" name="surname" value="<%=user.name.surname%>">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group col-md-6">
+            <label for="ourName" class="col-form-label">Preferred Name</label>
+            <input type="text" class="form-control" id="preferred" name="prefName" value="<%=user.name.preferred%>">
+          </div>
+          <div class="form-group col-md-6">
+            <label for="dob" class="col-form-label">Birthday</label>
+            <% if(user.birthday){ %>
+            <input type="text" class="form-control" id="dob" disabled value="<%=user.birthday.toDateString()%>">
+            <% } else { %>
+            <input type="date" class="form-control" id="dob">
+            <p><small>This allows you to view NSFW content if you'd like. You also cannot change this once it has been entered, so be sure to double check.</small></p>
+            <% } %>
+          </div>
+        </div>
+        <button type="button" class="btn btn-primary btn-sm submit-button" id="personal-submit" data-name="name">Update</button>
+      </form>
+    </article>
+    <article class="block collapse" id="address">
+      <h2 class="block-name"><i class="fal fa-envelope fa-lg fa-fw"></i>Address</h2>
+      <form>
+        <p class="text-muted small text-md-center">We need your address to verify payments, to send artwork and to prepare your tax paperwork.</p>
+        <div class="form-group">
+          <label for="line1" class="col-form-label">Address Line 1</label>
+          <input type="text" class="form-control" id="line1" name="line1" value="<%=user.address.line1%>">
+        </div>
+        <div class="form-group">
+          <label for="line2" class="col-form-label">Address Line 2</label>
+          <input type="text" class="form-control" id="line2" name="line2" value="<%=user.address.line2%>">
+        </div>
+        <%if(['AU','CA','US'].includes(user.address.country.code.toUpperCase())){ %>
+        <div class="form-row">
+          <div class="form-group col-md-3">
+            <label for="city" class="col-form-label">City</label>
+            <input type="text" class="form-control" id="city" name="stateCity" value="<%=user.address.city%>">
+          </div>
+          <div class="form-group col-md-3">
+            <label for="state" class="col-form-label">State</label>
+            <select class="custom-select w-100" id="state" name="state">
+              <% if(user.address.state.code){ %>
+              <option selected value="<%=user.address.state.code%>"><%=user.address.state.name%></option>
+              <% } %>
+              <% let stateKeys = Object.keys(states[user.address.country.code.toUpperCase()]);%>
+              <% for(let key of stateKeys){ %>
+              <option value="<%=key%>"><%=states[user.address.country.code.toUpperCase()][key]%></option>
+              <% } %>
+            </select>
+          </div>
+          <div class="form-group col-md-3">
+            <label for="country" class="col-form-label">Country</label>
+            <select id="country" name="country" class="custom-select w-100">
+              <% let countryKeys = Object.keys(countries);%>
+              <option value="<%=user.address.country.code%>"><%=user.address.country.name%></option>
+              <% for(let key of countryKeys){ %>
+              <option value="<%=key%>"><%=countries[key]%></option>
+              <% } %>
+            </select>
+          </div>
+          <div class="form-group col-md-3">
+            <label for="post" class="col-form-label">Zip or Postcode</label>
+            <input type="text" class="form-control" id="post" name="post" placeholder="04101" value="<%=user.address.post%>">
+          </div>
+        </div>
+        <% } else { %>
+        <div class="form-row">
+          <div class="form-group col-md-4">
+            <label for="city" class="col-form-label">City</label>
+            <input type="text" class="form-control" id="city" name="city" value="<%=user.address.city%>">
+          </div>
+          <div class="form-group col-md-4">
+            <label for="country" class="col-form-label">Country</label>
+            <select id="country" name="country" class="custom-select w-100">
+              <% let keys = Object.keys(countries);%>
+              <option value="<%=user.address.country.code%>"><%=user.address.country.name%></option>
+              <% for(let key of keys){ %>
+              <option value="<%=key%>"><%=countries[key]%></option>
+              <% } %>
+            </select>
+          </div>
+          <div class="form-group col-md-4">
+            <label for="post" class="col-form-label">Zip or Postcode</label>
+            <input type="text" class="form-control" id="post" name="post" placeholder="04101" value="<%=user.address.post%>">
+          </div>
+        </div>
+        <% } %>
+        <button type="button" class="btn btn-primary btn-sm submit-button" data-name="address">Update</button>
+      </form>
+    </article>
+    <article class="block collapse" id="social-accounts">
+      <h2 class="block-name"><i class="fal fa-share-alt fa-lg fa-fw"></i>Social Accounts</h2>
+      <form id="social-form">
+        <div class="input-group">
+          <span class="input-group-prepend">
+            <span class="input-group-text">
+              <i class="fab fa-fw fa-behance"></i>
+            </span>
+          </span>
+          <input type="text" name="behance" class="form-control social-input" id="behance" placeholder="Behance URL" value="<%=currentUser.social.behance%>" data-name="behance">
+        </div>
+        <div class="input-group">
+          <span class="input-group-prepend">
+            <span class="input-group-text">
+              <i class="fab fa-fw fa-deviantart"></i>
+            </span>
+          </span>
+          <input type="text" name="deviantart" class="form-control social-input" id="deviantart" placeholder="Deviantart Username" value="<%=currentUser.social.deviantart%>" data-name="deviantart">
+        </div>
+        <div class="input-group">
+          <span class="input-group-prepend">
+            <span class="input-group-text">
+              <i class="fab fa-fw fa-discord"></i>
+            </span>
+          </span>
+          <input type="text" name="discord" class="form-control social-input" id="discord" placeholder="Discord URL" value="<%=currentUser.social.discord%>" data-name="discord">
+        </div>
+        <div class="input-group">
+          <span class="input-group-prepend">
+            <span class="input-group-text">
+              <i class="fab fa-fw fa-dribbble"></i>
+            </span>
+          </span>
+          <input type="text" name="dribbble" class="form-control social-input" id="dribbble" placeholder="Dribbble Username" value="<%=currentUser.social.dribbble%>" data-name="dribbble">
+        </div>
+        <div class="input-group">
+          <span class="input-group-prepend">
+            <span class="input-group-text">
+              <i class="fab fa-fw fa-etsy"></i>
+            </span>
+          </span>
+          <input type="text" name="etsy" class="form-control social-input" id="etsy" placeholder="Etsy Username" value="<%=currentUser.social.etsy%>" data-name="etsy">
+        </div>
+        <div class="input-group">
+          <span class="input-group-prepend">
+            <span class="input-group-text">
+              <i class="fab fa-fw fa-facebook"></i>
+            </span>
+          </span>
+          <input type="text" name="facebook" class="form-control social-input" id="facebook" placeholder="Facebook URL" value="<%=currentUser.social.facebook%>" data-name="facebook">
+        </div>
+        <div class="input-group">
+          <span class="input-group-prepend">
+            <span class="input-group-text">
+              <i class="fab fa-fw fa-instagram"></i>
+            </span>
+          </span>
+          <input type="text" name="instagram" class="form-control social-input" id="instagram" placeholder="Instagram Username" value="<%=currentUser.social.instagram%>" data-name="instagram">
+        </div>
+        <div class="input-group">
+          <span class="input-group-prepend">
+            <span class="input-group-text">
+              <i class="fab fa-fw fa-patreon"></i>
+            </span>
+          </span>
+          <input type="text" name="patreon" class="form-control social-input" id="patreon" placeholder="Patreon Username" value="<%=currentUser.social.patreon%>" data-name="patreon">
+        </div>
+        <div class="input-group">
+          <span class="input-group-prepend">
+            <span class="input-group-text">
+              <i class="fab fa-fw fa-pinterest"></i>
+            </span>
+          </span>
+          <input type="text" name="pinterest" class="form-control social-input" id="pinterest" placeholder="Pinterest Username" value="<%=currentUser.social.pinterest%>" data-name="pinterest">
+        </div>
+        <div class="input-group">
+          <span class="input-group-prepend">
+            <span class="input-group-text">
+              <i class="fab fa-fw fa-soundcloud"></i>
+            </span>
+          </span>
+          <input type="text" name="soundcloud" class="form-control social-input" id="soundcloud" placeholder="Soundcloud Username" value="<%=currentUser.social.soundcloud%>" data-name="soundcloud">
+        </div>
+        <div class="input-group">
+          <span class="input-group-prepend">
+            <span class="input-group-text">
+              <i class="fab fa-fw fa-tumblr"></i>
+            </span>
+          </span>
+          <input type="text" name="tumblr" class="form-control social-input" id="tumblr" placeholder="Tumblr Username" value="<%=currentUser.social.tumblr%>" data-name="tumblr">
+        </div>
+        <div class="input-group">
+          <span class="input-group-prepend">
+            <span class="input-group-text">
+              <i class="fab fa-fw fa-twitch"></i>
+            </span>
+          </span>
+          <input type="text" name="twitch" class="form-control social-input" id="twitch" placeholder="Twitch Username" value="<%=currentUser.social.twitch%>" data-name="twitch">
+        </div>
+        <div class="input-group">
+          <span class="input-group-prepend">
+            <span class="input-group-text">
+              <i class="fab fa-fw fa-twitter"></i>
+            </span>
+          </span>
+          <input type="text" name="twitter" class="form-control social-input" id="twitter" placeholder="Twitter Username" value="<%=currentUser.social.twitter%>" data-name="twitter">
+        </div>
+        <div class="input-group">
+          <span class="input-group-prepend">
+            <span class="input-group-text">
+              <i class="fab fa-fw fa-vimeo"></i>
+            </span>
+          </span>
+          <input type="text" name="vimeo" class="form-control social-input" id="vimeo" placeholder="Vimeo URL" value="<%=currentUser.social.vimeo%>" data-name="vimeo">
+        </div>
+        <div class="input-group">
+          <span class="input-group-prepend">
+            <span class="input-group-text">
+              <i class="fab fa-fw fa-youtube"></i>
+            </span>
+          </span>
+          <input type="text" name="youtube" class="form-control social-input" id="youtube" placeholder="Youtube URL" value="<%=currentUser.social.youtube%>" data-name="youtube">
+        </div>
+      </form>
+      <button type="button" class="btn btn-block btn-primary btn-sm" id="submit-social">Save Changes</button>
+    </article>
+    <article class="block collapse" id="delete-account">
+      <h2 class="block-name"><i class="fal fa-trash-alt fa-lg fa-fw"></i>Delete Account</h2>
+      <% if(pending || available){ %>
+        <% if(pending != 0 || available != 0){ %>
+        <p>
+          It looks like you still have funds in your account. Please make sure you payout all of those funds into your external account. Then you can close your account.
+        </p>
+        <% } %> 
+      <% } else { %>
+        <p>
+          We just want to check that you really want to go. Totally up to you. When you press that big, red button down there, everything that we know about you will be gone. Forever. There's no waiting period, no getting it back. 
+        </p>
+        <p>
+          If you did any commissions, the other party will still have access to the transaction records of those commissions. 
+        </p>
+        <a href="/dash/user/delete" class="btn btn-danger">Delete Forever</a>
+      <% } %>
+    </article>
+  </div>
+</section>

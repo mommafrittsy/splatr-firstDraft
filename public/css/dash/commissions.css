@@ -1,0 +1,57 @@
+.commission {
+  display: grid;
+  grid-row-gap: 15px;
+  grid-template-columns: 1fr;
+  grid-template-rows: 250px repeat(7, auto);
+  margin: 15px;
+  text-align: center;
+  width: 280px;
+}
+.commission > .commission-image {
+  background-position: 50% 50%;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+.commission.nsfw-true {
+  background-color: #42364c;
+  color: white;
+}
+#commissions {
+  align-items: start;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+.delete-button, .edit-button {
+  margin-bottom: 0;
+}
+h2, h3 {
+  margin-bottom: 0;
+}
+.name {
+  font-size:16pt;
+  font-weight: 400;
+  margin-bottom: 0;
+}
+p {
+  font-size: 12pt;
+  margin-bottom: 0;
+}
+.tag {
+  border-color: #46e2b0;
+  color: #46e2b0;
+  margin: 5px;
+}
+@media (min-width: 800px){
+  .commission {
+    grid-column-gap: 15px;
+    grid-template-columns: 250px 1fr;
+    grid-template-rows: repeat(7, auto);
+    text-align: right;
+    width: 560px;
+  }
+  .commission > .commission-image {
+    grid-column: 1;
+    grid-row: 1/9;
+  }
+}

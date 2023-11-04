@@ -1,0 +1,2152 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>The Dash.</title>
+  <link rel="icon" href="https://ayizan.blob.core.windows.net/site-images/Splatr Icon.png" type="image/png">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
+  <link rel="stylesheet" href="/now/sass/now-ui-kit.css">
+  <link rel="stylesheet" href="/css/main.css">
+  <% if(currentUser.preferences.night == true){ %>
+    <link rel="stylesheet" href="/css/dash-night.css">
+  <% } %>
+  <link rel="stylesheet" href="/css/dash.css">
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:700|Roboto" rel="stylesheet" type="text/css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.3.5/cropper.min.css">
+  <script type="text/javascript" src="/js/all.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/algoliasearch/3/algoliasearchLite.min.js"></script>
+  <%if(currentUser.isArtist == true){%>
+  <script src="https://js.stripe.com/v3/" type="text/javascript"></script>
+  <% } %>
+  <style>
+    #container {
+      background-image:
+        linear-gradient(to right, rgba(35, 37, 38, .5), rgba(65, 67, 69, .5)),
+      <% if(!currentUser.preferences.background || currentUser.preferences.background == 7 ){ %>
+        url("https://ayizan.blob.core.windows.net/site-images/Backpacker w- camera.jpeg");
+      <% } else if(currentUser.preferences.background == 2 ) { %>
+        url("https://ayizan.blob.core.windows.net/site-images/Seattle.jpeg");
+      <% } else if(currentUser.preferences.background == 3 ) { %>
+        url("https://ayizan.blob.core.windows.net/site-images/Paint Pallette.jpeg");
+      <% } else if(currentUser.preferences.background == 4 ) { %>
+        url("https://ayizan.blob.core.windows.net/site-images/Melbourne.jpeg");
+      <% } else if(currentUser.preferences.background == 5 ) { %>
+        url("https://ayizan.blob.core.windows.net/site-images/Designer at Desk.jpeg");
+      <% } else if(currentUser.preferences.background == 6 ) { %>
+        url("https://ayizan.blob.core.windows.net/site-images/BFs at Sunset.jpeg");
+      <% } else if(currentUser.preferences.background == 1 ) { %>
+        url("https://ayizan.blob.core.windows.net/site-images/Shibuya.jpeg");
+      <% } %>
+    }
+  </style>
+</head>
+  <body>
+    <% include partials/feedback %>
+    <input type="hidden" id="userKey" value="<%=currentUser.searchKey%>" >
+    <div id="grid-container">
+      <nav>
+        <a href="/">
+          <img src="https://ayizan.blob.core.windows.net/ayizanlogos/Logos/Splatr Purple.svg" alt="Splatr Purple Splat Logo" alt="Splatr Logo">
+        </a>
+        <button title="Home" type="button" class="nav-item" id="homeButton" data-placement="right" data-section="home" data-toggle="tooltip">
+          <i class="dash-icons fal fa-home"></i>
+        </button>
+        <button title="Financials" type="button" class="nav-item" id="walletButton" data-placement="right" data-section="wallet" data-toggle="tooltip">
+          <i class="dash-icons fal fa-piggy-bank"></i>
+        </button>
+        <button title="Analytics" type="button" class="nav-item d-none d-md-inline" id="analyticButton" data-placement="right" data-section="analytics" data-toggle="tooltip">
+          <i class="dash-icons fal fa-analytics"></i>
+        </button>
+        <button title="Commissions" type="button" class="nav-item" id="commButton" data-placement="right" data-section="commissions" data-toggle="tooltip">
+          <i class="dash-icons fal fa-paint-brush"></i>
+        </button>
+        <button title="Social" type="button" class="nav-item" id="socialButton" data-placement="right" data-section="social" data-toggle="tooltip">
+          <i class="dash-icons fal fa-users"></i>
+        </button>
+        <a href="/" title="Go to Splatr.art" class="nav-item text-center" id="socialButton" data-placement="right" data-toggle="tooltip">
+          <i class="dash-icons fal fa-arrow-left"></i>
+        </a>
+      </nav>
+      <main role="main" id="container">
+        <% if(error && error.length > 0){ %>
+          <div class="container my-3">
+            <div class="alert alert-danger alert-dismissible fade show p-3" role="alert">
+              <div class="container">
+                <div class="alert-icon">
+                  <i class="now-ui-icons objects_support-17"></i>
+                </div>
+                <strong class="mr-3">Oh no!</strong> <%=error%>
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                  <span aria-hidden="true">
+                    <i class="far fa-times text-white"></i>
+                  </span>
+                </button>
+              </div>
+            </div>
+          </div>
+        <% } %>
+        <% if(success && success.length > 0){ %> 
+          <div class="container my-3">
+            <div class="alert alert-primary alert-dismissible fade show p-3" role="alert">
+              <div class="container align-items-center">
+                <strong><%= success%></strong>
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                  <span aria-hidden="true">
+                    <i class="far fa-times text-white"></i>
+                  </span>
+                </button>
+              </div>
+            </div>
+          </div>
+        <% } %>
+        <div class="container my-3 inactive" id="fetch-alert">
+          <div class="alert alert-dismissible fade show p-3" role="alert">
+            <div class="container align-items-center">
+                <span id="fetch-alert-span"></span>
+              <button type="button" class="close p-0" data-dismiss="alert" style="position:static" aria-label="Close">
+                <span aria-hidden="true">
+                  <i class="far fa-times text-white"></i>
+                </span>
+              </button>
+            </div>
+          </div>
+        </div>
+        <% if(currentUser.stripe.due_by){ %>
+        <div class="container my-3">
+          <div class="alert alert-dismissible alert-info fade show p-3" role="alert">
+            <div class="container align-items-center">
+                <span>We need some more information by: <%=currentUser.stripe.due_by.toDateString()%></span>
+              <button type="button" class="close p-0" data-dismiss="alert" style="position:static" aria-label="Close">
+                <span aria-hidden="true">
+                  <i class="far fa-times text-white"></i>
+                </span>
+              </button>
+            </div>
+          </div>
+        </div>
+        <% } %>
+        <div class="row justify-content-md-end justify-content-center text-center align-items-center mb-3" id="top">
+          <div class="col-12 col-md-6 text-center text-md-left">
+            <div class="row align-items-center">
+              <div class="col-12 col-md-6 text-center text-md-left">
+                <h1 class="text-md-left mb-3 mb-md-0 display-4" id="sectionTitle">Home</h1>
+              </div>
+              <div class="col-12 col-md-6 text-center text-md-right">
+                <h5 class="mb-0 text-center text-md-right">
+                  <%=`${fullDate.month} ${fullDate.day}, ${fullDate.year}`%>
+                </h5>
+              </div>
+            </div>
+          </div>
+          <div class="col-12 col-md-6 text-center text-md-right dropdown">
+            <% if(currentUser.notifications.length > 0){ %>
+            <button class="btn btn-link" id="notificationButton">
+              <span class="fa-layers fa-fw fa-2x">
+                <i class="fal fa-bell"></i>
+                <span class="fa-layers-counter fa-2x"  style="background:#46e2b0"><%=currentUser.notifications.length%></span>
+              </span>
+            </button>
+            <% } else { %>
+            <button class="btn btn-link" id="notificationButton">
+              <i class="fal fa-bell fa-2x"></i>    
+            </button>
+            <% } %>
+            <button class="btn btn-link" id="accountButton">
+              <i class="fal fa-cog fa-2x"></i>    
+            </button>
+            <a href="/logout" class="btn btn-link">
+              <i class="fal fa-sign-out-alt fa-2x"></i>   
+            </a>
+            <a href="/<%=currentUser.username%>" class="btn btn-link align-items-center">
+              <% if(!currentUser.profile.url){ %>
+                <i class="fal fa-user fa-2x mr-3"></i>
+                <% if(!currentUser.username) { %>
+                  YOUR USERNAME HERE!
+                <% } else { %>
+                <h5 class="d-inline"><span id="name-span"><%=currentUser.username%></span></h5>
+                <% } %>
+              <% } else { %>
+                <div class="rounded-circle profile-img ml-auto text-right" style="background-image:url('<%=currentUser.profile.url%>')"></div>
+                <h5 class="d-inline m-0"><span id="name-span"><%=currentUser.username%></span></h5>
+              <% } %>
+            </a>
+          </div>
+        </div>
+        <%if(missingInfo == true){ %>
+        <div class="row justify-content-center">
+          <div class="col-10">
+            <div class="card">
+              <div class="card-body text-center">
+                <p>*We need some additional info before you can be an artist.*</p>
+                <button type="button" class="btn btn-info" data-toggle="modal" data-target="#more-info-modal">Update Information</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <% } %>
+        <div id="home">
+          <div class="row justify-content-center">
+            <div class="col-10 col-xl-3 mb-3">
+              <div class="card">
+                <div class="card-header home">
+                  <i class="fal fa-wrench fa-lg mr-3"></i>
+                  Quick Tools
+                </div>
+                <div class="card-body">
+                  <a href="/dash/preference" class="btn btn-block text-left" id="night-mode">
+                    <% if(currentUser.preferences.night == false){ %>
+                    <i class="fal fa-lg fa-moon mr-3"></i>
+                    Night Mode
+                    <% } else { %>
+                    <i class="fal fa-lg fa-sun mr-3"></i>
+                    Day Mode
+                    <% } %> 
+                  </a>
+                  <% if(NSFW == true){ %>
+                  <button type="button" class="btn btn-block btn-success text-left" id="nsfw-filter-btn">
+                    <%if(currentUser.nsfw_filter == false){ %>
+                    <i class="far fa-eye-slash mr-3" id="nsfw-icon"></i>
+                    <span id="nsfw-text">Hide NSFW Content</span>
+                    <% } else { %>
+                    <i class="far fa-eye mr-3" id="nsfw-icon"></i>
+                    <span id="nsfw-text" id="nsfw-icon">Show NSFW Content</span>
+                    <% } %>
+                  </button>
+                  <% } %>
+                  <%if(currentUser.isArtist == true){ %>
+                    <%if(currentUser.stripe.fields_needed.length == 0 || (currentUser.stripe.fields_needed.length == 1 && currentUser.stripe.fields_needed.includes('external_account'))){ %>
+                      <% if(currentUser.open == true && currentUser.verified.verified == true){ %>
+                      <button type="button" class="btn btn-block btn-primary text-left" id="new-comm" data-toggle="modal" data-target="#new-comm-modal">
+                        <i class="fal fa-lg fa-plus-circle mr-3"></i>
+                        New Comm
+                      </button>
+                      <a href="/dash/commission/status" class="btn btn-block btn-danger text-left">
+                        <i class="fal fa-lg fa-times-circle mr-3"></i>
+                        Close Comms
+                      </a>
+                      <% } else { %>
+                      <a href="/dash/commission/status" class="btn btn-block btn-success text-left">
+                        <i class="fal fa-lg fa-check-circle mr-3"></i>Open Comms
+                      </a>
+                      <% } %>
+                    <% } else if(currentUser.stripe.fields_needed.includes('legal_entity.ssn_last_4') || currentUser.stripe.fields_needed.includes('legal_entity.personal_id_number') || currentUser.stripe.fields_needed.includes('legal_entity.verification.document') || currentUser.verified.verified == false) { %>
+                    <button type="button" class="btn btn-block btn-primary text-left" id="verify" data-toggle="modal" data-target="#verify-modal">
+                      <i class="fal fa-lg fa-check-circle mr-3"></i>
+                      Verify Account
+                    </button>
+                    <% } %>
+                  <% } %>
+                  <% if(currentUser.isArtist == true && currentUser.stripe.fields_needed.includes('external_account')){ %>
+                  <button type="button" class="btn btn-block btn-success text-left" id="external-account-btn" data-toggle="modal" data-target="#external-account-modal">
+                    <i class="fal fa-lg fa-university mr-3"></i>
+                    Add External Account
+                  </button>
+                  <% } %>
+                  <%if(currentUser.isArtist == false && currentUser.canArt == true && currentUser.missingInfo == false){ %>
+                  <a href="/dash/user/become_artist" class="btn btn-block btn-info text-left" id="become-artist">
+                    <i class="far fa-paint-brush fa-lg mr-3"></i>Become an Artist
+                  </a>
+                  <% } %>
+                  </div>
+              </div>
+            </div>
+            <div class="col-10 col-xl-9">
+              <div class="row">
+                <div class="col-12 col-lg-6">
+                  <div class="card">
+                    <div class="card-header">
+                      <i class="fal fa-person-carry fa-lg mr-3"></i>
+                      Working On
+                    </div>
+                    <div class="card-body">
+                     <table class="table table-striped">
+                      <thead>
+                        <th class="text-center">Client</th>
+                        <th class="text-center">Status</th>
+                        <th class="text-center">Activity</th>
+                      </thead>
+                      <tbody>
+                        <% currentUser.transactions.forEach((trans)=>{ %>
+                          <%if(!['requested','closed','declined'].includes(trans.status)){%>
+                          <tr>
+                            <% if(trans.client.id == currentUser._id.toString()){ %>
+                            <td><a href="/transaction/<%=trans._id%>">You</a></td>
+                            <% } else { %>
+                            <td><a href="/transaction/<%=trans._id%>"><%=trans.client.username%></a></td>
+                            <% } %>
+                            <td><a href="/transaction/<%=trans._id%>">
+                              <%if(trans.status == 'previewAccept'){%>
+                              Preview Accepted
+                              <% } else { %>
+                              <%=trans.status.charAt(0).toUpperCase() + trans.status.slice(1);%>
+                              <% } %>
+                            </a></td>
+                            <td><a href="/transaction/<%=trans._id%>"><%=datify(trans.dates.activity, 'US')%></a></td>
+                          </tr>
+                          <% } %>
+                        <% }); %>
+                      </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-12 col-lg-6">
+                  <div class="card">
+                    <div class="card-header">
+                      <i class="fal fa-hand-holding-usd fa-lg mr-3"></i>
+                      Requests
+                    </div>
+                    <div class="card-body">
+                      <table class="table table-striped">
+                        <thead>
+                          <tr>
+                            <th class="text-center">Client</th>
+                            <th class="text-center">Comm Type</th>
+                          </tr>
+                        </thead>
+                          <% currentUser.transactions.forEach((trans)=>{ %>
+                          <% if(trans.status == "requested"){ %>
+                          <tr>
+                            <td><a href="/<%=trans.client.username %>"><%=trans.client.username %></a></td>
+                            <td><a href="/transaction/<%=trans._id%>"><%=trans.type.name %></a></td>
+                          </tr>
+                          <% } %>
+                        <% }); %>
+                        </table>
+                      </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="inactive" id="notifications">
+          <div class="row justify-content-center">
+            <div class="col-10 col-xl-8">
+              <div class="card">
+                <div class="card-header">
+                  <i class="fal fa-bell fa-lg mr-3"></i>
+                  Notifications
+                </div>
+                <div class="card-body text-center" id="notification-zone">
+                  <% if(currentUser.notifications.length > 0){ %>
+                    <% if(currentUser.notifications.length > 2){ %>
+                    <button type='button' class="btn btn-info btn-lg mb-3" id="remove-all">Remove All</button>
+                    <% } %>
+                  <% for(let note of currentUser.notifications){ %>
+                  <div class="row justify-content-center align-items-center">
+                    <div class="col-12 col-md-8 p-1 notification mb-3" id="notification-<%=note._id%>">
+                      <a href="<%=note.url%>">
+                        <div class="card-body">
+                          <div class="row align-items-center text-center">
+                            <div class="col-12 col-md-6 col-xl-4">
+                              <% if(note.type =="review"){ %>
+                              <i class="fas fa-pencil-alt fa-3x noticon"></i>
+                              <% } else if(note.type == "paid"||note.type =="deposit"){%>
+                              <i class="fas fa-money-bill-wave fa-3x noticon"></i>
+                              <% } else if(['previewAccept','like','comment-like','accept'].includes(note.type)){ %>
+                              <i class="fas fa-thumbs-up fa-3x noticon"></i>
+                              <% } else if(note.type == "request"){ %>
+                              <i class="fas fa-paper-plane fa-3x noticon"></i>
+                              <% } else if(note.type == "trans-comment" || note.type == "comment") { %>
+                              <i class="fas fa-comments fa-3x noticon"></i>
+                              <% } else if(['references','preview','final'].includes(note.type)){%>
+                              <i class="fas fa-images fa-3x noticon"></i>
+                              <% } else if(note.type == "follow"){ %>
+                              <i class="fas fa-user-friends fa-3x noticon"></i>
+                              <% } else if(note.type == "open") { %>
+                              <i class="fas fa-user-check fa-3x noticon"></i>
+                              <% } else if(note.type == 'decline'){ %>
+                              <i class="fas fa-thumbs-down fa-3x noticon"></i>
+                              <% } %>
+                            </div>
+                            <div class="col-12 col-md-6 col-xl-8">
+                              <p class="text-md-right mb-1 date"><%=note.date.toDateString()%></p>
+                              <% if(note.type == "review"){ %>
+                              <p class="text-md-right mb-0 note-text"><%=note.from.username%> wrote a review.</p>
+                              <% } else if(note.type == "paid") { %>
+                              <p class="text-md-right mb-0 note-text"><%=note.from.username%> completed payment.</p>
+                              <% } else if(note.type == "deposit"){ %>
+                              <p class="text-md-right mb-0 note-text"><%=note.from.username%> paid their deposit.</p>
+                              <% } else if(note.type == "previewAccept"){%>
+                              <p class="text-md-right mb-0 note-text"><%=note.from.username%> wrote a review.</p>
+                              <% } else if(note.type == "like"){ %>
+                              <p class="text-md-right mb-0 note-text"><%=note.from.username%> liked your artwork!</p>
+                              <% } else if(note.type == "comment-like"){ %> 
+                              <p class="text-md-right mb-0 note-text"><%=note.from.username%> liked your comment!</p>
+                              <% } else if(note.type == "accept"){ %>
+                              <p class="text-md-right mb-0 note-text"><%=note.from.username%> accepted your commission request.</p>
+                              <% } else if(note.type == "request"){ %>
+                              <p class="text-md-right mb-0 note-text"><%=note.from.username%> requested a commission.</p>
+                              <% } else if(note.type == "trans-comment"){ %>
+                              <p class="text-md-right mb-0 note-text"><%=note.from.username%> commented on the commission.</p>
+                              <% } else if(note.type == "comment"){ %>
+                              <p class="text-md-right mb-0 note-text"><%=note.from.username%> commented on your artwork.</p>
+                              <% } else if(note.type == "references"){ %>
+                              <p class="text-md-right mb-0 note-text"><%=note.from.username%> sent you some references.</p>
+                              <% } else if(note.type == "preview"){ %>
+                              <p class="text-md-right mb-0 note-text"><%=note.from.username%> uploaded a preview of your commission.</p>
+                              <% } else if(note.type == "final"){ %>
+                              <p class="text-md-right mb-0 note-text"><%=note.from.username%> uploaded your final commission.</p>
+                              <% } else if(note.type == "follow"){ %>
+                              <p class="text-md-right mb-0 note-text"><%=note.from.username%> is now following you!</p>
+                              <% } else if(note.type == "open"){ %>
+                              <p class="text-md-right mb-0 note-text"><%=note.from.username%> is now open for commissions!</p>
+                              <% } else if(note.type == "decline"){ %>
+                              <p class="text-md-right mb-0 note-text">Sorry, your commission request was declined.</p>
+                              <% } %>
+                            </div>
+                          </div>
+                        </div>
+                      </a>
+                    </div>
+                    <div class="col-12 col-md-2 text-center delete" data-id="<%=note._id%>">
+                      <i class="fas fa-times-circle fa-2x text-danger"></i>
+                    </div>
+                  </div>
+                  <% } %>
+                  <% } %>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="inactive" id="account">
+          <div class="row justify-content-center">
+            <div class="col-10 col-lg-4">
+              <div class="card">
+                <div class="card-header" id="account-tools">
+                  <i class="far fa-cog fa-lg mr-3"></i>
+                  Account Settings
+                </div>
+                <div class="card-body">
+                  <button type="button" class="btn btn-block btn-primary text-left" data-toggle="collapse" data-target="#collapseLogin" aria-expanded="false" aria-controls="collapseLogin">
+                    <i class="far fa-sign-in-alt fa-lg mr-3"></i>
+                    Login
+                  </button>
+                  <button type="button" class="btn btn-block btn-primary text-left" data-toggle="collapse" data-target="#collapsePersonal" aria-expanded="false" aria-controls="collapsePersonal">
+                    <i class="far fa-user fa-lg mr-3"></i>
+                    Personal
+                  </button>
+                  <button type="button" class="btn btn-block btn-primary text-left" data-toggle="collapse" data-target="#collapseAddress" aria-expanded="false" aria-controls="collapseAddress">
+                    <i class="far fa-envelope fa-lg mr-3"></i>
+                    Address
+                  </button>
+                  <button type="button" class="btn btn-block btn-primary text-left" data-toggle="collapse" data-target="#collapseArtist" aria-expanded="false" aria-controls="collapseArtist">
+                    <i class="far fa-paint-brush fa-lg mr-3"></i>
+                    Profile
+                  </button>
+                  <button type="button" class="btn btn-block btn-primary text-left" data-toggle="collapse" data-target="#collapseSocial" aria-expanded="false" aria-controls="collapseSocial">
+                    <i class="far fa-share-alt fa-lg mr-3"></i>
+                    Social
+                  </button>
+                  <button type="button" class="btn btn-block btn-primary text-left" data-toggle="collapse" data-target="#collapsePersonalize" aria-expanded="false" aria-controls="collapsePersonalize">
+                    <i class="far fa-paint-roller fa-lg mr-3"></i>
+                    Personalize
+                  </button>
+                  <button type="button" class="btn btn-block btn-primary text-left" data-toggle="modal" data-target="#deleteAccount">
+                    <i class="far fa-trash-alt fa-lg mr-3"></i>
+                    Delete Account
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div class="col-10 col-lg-8">
+              <div class="collapse show mb-3" id="collapseLogin">
+                <div class="card">
+                  <div class="card-header login">
+                    <i class="fal fa-sign-in-alt fa-lg mr-3"></i>
+                    Login
+                  </div>
+                  <form action="/dash/login" method="POST" id="login-change">
+                    <div class="card-body">
+                      <div class="form-group">
+                        <label for="changeUsername">Username</label>
+                        <span class="badge badge-danger ml-3" id="taken-badge"></span>
+                        <span class="badge badge-success ml-3" id="free-badge"></span>
+                        <input type="text" min-length="4" class="form-control mb-2 mr-sm-2 mb-sm-0 form-inline" id="changeUsername" name="changeUsername" value="<%=currentUser.username%>" placeholder="Username">
+                      </div>
+                      <div class="form-group">
+                        <label for="changeEmail">Email</label>
+                        <input type="email" class="form-control mb-2 mr-sm-2 mb-sm-0 form-inline" id="changeEmail" name="changeEmail" value="<%=currentUser.email%>">
+                      </div>
+                      <div class="checkbox">
+                        <%if (currentUser.marketingEmails == true){ %>
+                        <input id="marketing" name="marketing" type="checkbox" checked>
+                        <% } else { %>
+                        <input id="marketing" name="marketing" type="checkbox">
+                        <% } %>
+                        <label for="marketing">
+                          Receiving Marketing Emails (We won't spam you, promise.)
+                        </label>
+                      </div>
+                      <div class="form-group">
+                        <label for="changePass">Password</label>
+                      </div>
+                      <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#passModal">Change Password</button>
+                    </div>
+                    <div class="card-footer p-0">
+                      <button type="submit" class="btn btn-block btn-primary text-center" form="login-change" id="login-change-btn">Update</button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+              <div class="collapse mb-3" id="collapsePersonal">
+                <div class="card">
+                  <div class="card-header personal">
+                    <i class="fal fa-user fa-lg mr-3"></i>
+                      Personal
+                  </div>
+                  <form action="/dash/name" method="POST" id="name-change">
+                    <div class="card-body">
+                      <div class="row justify-content-center">
+                        <div class="col-12">
+                          <div class="spinner inactive" id="personal-spinner"></div>
+                        </div>
+                      </div>
+                      <div id="personal-form">
+                        <div class="form-row">
+                          <div class="form-group col-md-6">
+                            <label for="firstName" class="col-form-label">Given Name</label>
+                            <input type="text" class="form-control" id="firstName" name="given" value="<%=currentUser.name.given%>">
+                          </div>
+                          <div class="form-group col-md-6">
+                            <label for="lastName" class="col-form-label">Surname</label>
+                            <input type="text" class="form-control" id="lastName" name="surname" value="<%=currentUser.name.surname%>">
+                          </div>
+                        </div>
+                        <div class="form-row">
+                          <div class="form-group col-md-6">
+                            <label for="ourName" class="col-form-label">Preferred Name</label>
+                            <input type="text" class="form-control" id="prefName" name="prefName" value="<%=currentUser.name.preferred%>">
+                          </div>
+                          <div class="form-group col-md-6">
+                            <label for="birthday" class="col-form-label">Birthday</label>
+                            <% if(currentUser.birthday){ %>
+                            <input type="text" class="form-control" id="birthday" disabled value="<%=currentUser.birthday.toDateString()%>">
+                            <% } else { %>
+                            <input type="date" class="form-control" id="birthday">
+                            <p><small>This allows you to view NSFW content if you'd like. You also cannot change this once it has been entered, so be sure to double check.</small></p>
+                            <% } %>
+                          </div>
+                        </div>
+                        <button type="submit" class="btn btn-block btn-primary" id="personal-button">Update</button>
+                      </div>
+                    </div>
+                  </form>
+                </div>
+              </div>
+              <div class="collapse mb-3" id="collapseAddress">
+                <div class="card">
+                  <div class="card-header address">
+                    <i class="fal fa-envelope fa-lg mr-3"></i>
+                    Address
+                  </div>
+                  <form action="/dash/address" method="POST">
+                    <div class="card-body">
+                      <p class="text-muted small text-md-center">We need your address to verify payments, to send artwork and to prepare your tax paperwork.</p>
+                      <div class="form-group">
+                        <label for="line1" class="col-form-label">Address Line 1</label>
+                        <input type="text" class="form-control" id="line1" name="line1" value="<%=currentUser.address.line1%>">
+                      </div>
+                      <div class="form-group">
+                        <label for="line2" class="col-form-label">Address Line 2</label>
+                        <input type="text" class="form-control" id="line2" name="line2" value="<%=currentUser.address.line2%>">
+                      </div>
+                      <%if(['AU','CA','US'].includes(currentUser.address.country.code.toUpperCase())){ %>
+                      <div class="form-row">
+                        <div class="form-group col-md-3">
+                          <label for="city" class="col-form-label">City</label>
+                          <input type="text" class="form-control" id="city" name="stateCity" value="<%=currentUser.address.city%>">
+                        </div>
+                        <div class="form-group col-md-3">
+                          <label for="state" class="col-form-label">State</label>
+                          <select class="custom-select w-100" id="state" name="state">
+                            <% if(currentUser.address.state.code){ %>
+                            <option selected value="<%=currentUser.address.state.code%>"><%=currentUser.address.state.name%></option>
+                            <% } %>
+                            <% let stateKeys = Object.keys(states[currentUser.address.country.code.toUpperCase()]);%>
+                            <% for(let key of stateKeys){ %>
+                            <option value="<%=key%>"><%=states[currentUser.address.country.code.toUpperCase()][key]%></option>
+                            <% } %>
+                          </select>
+                        </div>
+                        <div class="form-group col-md-3">
+                          <label for="country" class="col-form-label">Country</label>
+                          <select id="country" name="country" class="custom-select w-100">
+                            <% let countryKeys = Object.keys(countries);%>
+                            <option value="<%=currentUser.address.country.code%>"><%=currentUser.address.country.name%></option>
+                            <% for(let key of countryKeys){ %>
+                            <option value="<%=key%>"><%=countries[key]%></option>
+                            <% } %>
+                          </select>
+                        </div>
+                        <div class="form-group col-md-3">
+                          <label for="post" class="col-form-label">Zip or Postcode</label>
+                          <input type="text" class="form-control" id="post" name="post" placeholder="04101" value="<%=currentUser.address.post%>">
+                        </div>
+                      </div>
+                      <% } else { %>
+                      <div class="form-row">
+                        <div class="form-group col-md-4">
+                          <label for="city" class="col-form-label">City</label>
+                          <input type="text" class="form-control" id="city" name="city" value="<%=currentUser.address.city%>">
+                        </div>
+                        <div class="form-group col-md-4">
+                          <label for="country" class="col-form-label">Country</label>
+                          <select id="country" name="country" class="custom-select w-100">
+                            <% let keys = Object.keys(countries);%>
+                            <option value="<%=currentUser.address.country.code%>"><%=currentUser.address.country.name%></option>
+                            <% for(let key of keys){ %>
+                            <option value="<%=key%>"><%=countries[key]%></option>
+                            <% } %>
+                          </select>
+                        </div>
+                        <div class="form-group col-md-4">
+                          <label for="post" class="col-form-label">Zip or Postcode</label>
+                          <input type="text" class="form-control" id="post" name="post" placeholder="04101" value="<%=currentUser.address.post%>">
+                        </div>
+                      </div>
+                      <% } %>
+                    </div>
+                    <div class="card-footer p-0">
+                      <button type="button" id="address-submit" class="btn btn-block btn-primary">Update</button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+              <div class="collapse mb-3" id="collapseArtist">
+                <div class="card">
+                  <div class="card-header artist">
+                    <i class="fal fa-paint-brush fa-lg mr-3"></i>
+                    Profile
+                  </div>
+                  <div class="card-body">
+                    <div class="row align-items-center">
+                      <div class="col-12 col-md-4">
+                        <label for="profile-pic-upload">Profile Picture</label>
+                        <div class="p-3">
+                          <div class="spinner inactive" id="profile-spinner">
+                            <div class="double-bounce1"></div>
+                            <div class="double-bounce2"></div>
+                          </div>
+                          <div class="row justify-content-center align-items-center" id="profile-pic-upload">
+                            <% if(!currentUser.profile.url){ %>
+                            <div class="col-12 text-center py-3"  id="profile-display">
+                              <i class="fal fa-cloud-upload-alt fa-5x"></i>
+                              <p class="text-muted my-2">Upload Profile Picture</p>
+                            </div>
+                            <div class="col-12 text-center">
+                              <label for="profile-input" class="btn btn-primary btn-block" id="profile-label">Upload</label>
+                              <button type="button" class="btn btn-primary btn-block inactive" id="profile-submit">Save</button>
+                            </div>
+                            <% } else { %>
+                            <div class="col-12" id="profile-display">
+                              <img class="img-fluid" src="<%=currentUser.profile.url%>" alt="profile image">
+                            </div>
+                            <div class="col-12 text-center">
+                              <label for="profile-input" id="profile-label" class="btn btn-primary btn-block">Change</label>
+                              <button type="button" class="btn btn-primary btn-block inactive" id="profile-submit">Save</button>
+                            </div>
+                            <% } %>
+                          </div>
+                          <input type="file" id="profile-input" name="profileInput" class="d-none" accept="image/*" autocomplete="off">
+                        </div>
+                      </div>
+                      <div class="col-12 col-md-8">
+                        <label for="banner-img-upload">Banner</label>
+                        <div class="p-3">
+                          <div class="spinner inactive" id="banner-spinner">
+                            <div class="double-bounce1"></div>
+                            <div class="double-bounce2"></div>
+                          </div>
+                          <div class="row justify-content-center align-items-center" id="banner-img-upload">
+                            <% if(!currentUser.banner.url){ %>
+                            <div class="col-12 text-center py-3"  id="banner-display">
+                              <i class="fal fa-cloud-upload-alt fa-5x"></i>
+                              <p class="text-muted my-2">Upload Banner</p>
+                            </div>
+                            <div class="col-12 text-center">
+                              <label for="banner-input" id="banner-label" class="btn btn-primary btn-block">Upload</label>
+                              <button type="button" class="btn btn-primary btn-block inactive" id="banner-submit">Save</button>
+                            </div>
+                            <% } else { %>
+                            <div class="col-12" id="banner-display">
+                              <img class="img-fluid" src="<%=currentUser.banner.url%>" alt="banner image">
+                            </div>
+                            <div class="col-12 text-center">
+                              <label for="banner-input" id="banner-label" class="btn btn-primary btn-block">Change</label>
+                              <button type="button" class="btn btn-primary btn-block inactive" id="banner-submit">Save</button>
+                            </div>
+                            <% } %>
+                          </div>
+                          <input type="file" id="banner-input" name="bannerInput" class="d-none" accept="image/*" autocomplete="off">
+                        </div>
+                      </div>
+                    </div>
+                    <div class="row my-3">
+                      <div class="col-12">
+                        <form action="/dash/description" method="POST">
+                          <label for="artistDescription">Bio</label>
+                          <textarea id="artistDescription" name="artistDescription" data-id="<%=currentUser._id%>" class="form-control" maxlength="150" rows="2" style="overflow:hidden" placeholder="Let us know who you are! You've got 150 charaters."><%=currentUser.description%></textarea>
+                          <button type="submit" class="btn btn-block btn-primary text-center p-3 artist submit">Update</button>
+                        </form>
+                      </div>
+                    </div>
+                    <div class="row my-3">
+                      <div class="col-12">
+                        <form action="/dash/motto" method="POST">
+                          <label for="motto">What's your motto?</label>
+                          <input id="motto" name="motto" data-id="<%=currentUser._id%>" class="form-control" type="text" placeholder="So, who are you?" value="<%=currentUser.motto%>">
+                          <button type="submit" id="motto-submit" class="btn btn-block btn-primary text-center p-3 artist submit">Update</button>
+                        </form>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col-12">
+                        <label>What's Your Style?</label>
+                        <div class="mb-3" id="tag-display">
+                          <% currentUser.style.forEach((style)=>{ %>
+                            <span class="badge badge-primary mr-2"><%=style%><span class="ml-2" onclick="removeTag(this)" data-id="<%=currentUser._id%>"><i class="fal fa-times"></i></span></span>
+                          <% }); %>
+                        </div>
+                        <form action="/dash/style" method="POST">
+                          <input class="form-control" id="tags-input" name="tagsInput" type="text" data-url="<%=currentUser._id%>" placeholder="Enter tags separated by commas.">
+                          <button type="submit" class="btn btn-block btn-primary text-center p-3 artist submit">Update</button>
+                        </form>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="collapse mb-3" id="collapseSocial">
+                <form action="/dash/social" method="POST">
+                  <div class="card">
+                    <div class="card-header social">
+                      <i class="fal fa-share-alt fa-lg mr-3"></i>
+                      Social
+                    </div>
+                    <div class="card-body">
+                      <div class="row">
+                        <div class="col-12 col-lg-6">
+                          <div class="input-group mb-3">
+                            <span class="input-group-addon">
+                              <i class="fab fa-fw fa-behance"></i>
+                            </span>
+                            <input type="text" name="behance" class="form-control" id="behance" placeholder="Behance URL" value="<%=currentUser.social.behance%>">
+                          </div>
+                          <div class="input-group mb-3">
+                            <span class="input-group-addon">
+                              <i class="fab fa-fw fa-discord"></i>
+                            </span>
+                            <input type="text" name="discord" class="form-control" id="discord" placeholder="Discord URL" value="<%=currentUser.social.discord%>">
+                          </div>
+                          <div class="input-group mb-3">
+                            <span class="input-group-addon">
+                              <i class="fab fa-fw fa-etsy"></i>
+                            </span>
+                            <input type="text" name="etsy" class="form-control" id="etsy" placeholder="Etsy Username" value="<%=currentUser.social.etsy%>">
+                          </div>
+                          <div class="input-group mb-3">
+                            <span class="input-group-addon">
+                              <i class="fab fa-fw fa-instagram"></i>
+                            </span>
+                            <input type="text" name="instagram" class="form-control" id="instagram" placeholder="Instagram Username" value="<%=currentUser.social.instagram%>">
+                          </div>
+                          <div class="input-group mb-3">
+                            <span class="input-group-addon">
+                              <i class="fab fa-fw fa-pinterest"></i>
+                            </span>
+                            <input type="text" name="pinterest" class="form-control" id="pinterest" placeholder="Pinterest Username" value="<%=currentUser.social.pinterest%>">
+                          </div>
+                          <div class="input-group mb-3">
+                            <span class="input-group-addon">
+                              <i class="fab fa-fw fa-tumblr"></i>
+                            </span>
+                            <input type="text" name="tumblr" class="form-control" id="tumblr" placeholder="Tumblr Username" value="<%=currentUser.social.tumblr%>">
+                          </div>
+                          <div class="input-group mb-3">
+                            <span class="input-group-addon">
+                              <i class="fab fa-fw fa-twitter"></i>
+                            </span>
+                            <input type="text" name="twitter" class="form-control" id="twitter" placeholder="Twitter Username" value="<%=currentUser.social.twitter%>">
+                          </div>
+                          <div class="input-group mb-3">
+                            <span class="input-group-addon">
+                              <i class="fab fa-fw fa-youtube"></i>
+                            </span>
+                            <input type="text" name="youtube" class="form-control" id="youtube" placeholder="Youtube URL" value="<%=currentUser.social.youtube%>">
+                          </div>
+                        </div>
+                        <div class="col-12 col-lg-6">
+                          <div class="input-group mb-3">
+                            <span class="input-group-addon">
+                              <i class="fab fa-fw fa-deviantart"></i>
+                            </span>
+                            <input type="text" name="deviantart" class="form-control" id="deviantart" placeholder="Deviantart Username" value="<%=currentUser.social.deviantart%>">
+                          </div>
+                          <div class="input-group mb-3">
+                            <span class="input-group-addon">
+                              <i class="fab fa-fw fa-dribbble"></i>
+                            </span>
+                            <input type="text" name="dribbble" class="form-control" id="dribbble" placeholder="Dribbble Username" value="<%=currentUser.social.dribbble%>">
+                          </div>
+                          <div class="input-group mb-3">
+                            <span class="input-group-addon">
+                              <i class="fab fa-fw fa-facebook"></i>
+                            </span>
+                            <input type="text" name="facebook" class="form-control" id="facebook" placeholder="Facebook URL" value="<%=currentUser.social.facebook%>">
+                          </div>
+                          <div class="input-group mb-3">
+                            <span class="input-group-addon">
+                              <i class="fab fa-fw fa-patreon"></i>
+                            </span>
+                            <input type="text" name="patreon" class="form-control" id="patreon" placeholder="Patreon Username" value="<%=currentUser.social.patreon%>">
+                          </div>
+                          <div class="input-group mb-3">
+                            <span class="input-group-addon">
+                              <i class="fab fa-fw fa-soundcloud"></i>
+                            </span>
+                            <input type="text" name="soundcloud" class="form-control" id="soundcloud" placeholder="Soundcloud Username" value="<%=currentUser.social.soundcloud%>">
+                          </div>
+                          <div class="input-group mb-3">
+                            <span class="input-group-addon">
+                              <i class="fab fa-fw fa-twitch"></i>
+                            </span>
+                            <input type="text" name="twitch" class="form-control" id="twitch" placeholder="Twitch Username" value="<%=currentUser.social.twitch%>">
+                          </div>
+                          <div class="input-group mb-3">
+                            <span class="input-group-addon">
+                              <i class="fab fa-fw fa-vimeo"></i>
+                            </span>
+                            <input type="text" name="vimeo" class="form-control" id="vimeo" placeholder="Vimeo URL" value="<%=currentUser.social.vimeo%>">
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="card-footer p-0">
+                      <button type="submit" class="btn btn-block btn-primary text-center" id="social-submit">Update</button>
+                    </div>
+                  </div>
+                </form>
+              </div>
+              <div class="collapse mb-3" id="collapsePersonalize">
+                <div class="card">
+                  <div class="card-header">
+                    <i class="fal fa-paint-roller fa-lg mr-3"></i>
+                    Personalize
+                  </div>
+                  <form action="/dash/background" method="POST" id="background">
+                    <div class="card-body">
+                      <div class="form-group">
+                        <label for="changeBackground">Background</label>
+                        <div class="form-row">
+                          <div class="form-group col-sm-6 col-lg-4 col-xl-3">
+                            <%if(currentUser.preferences.background == 1){ %>
+                            <input type="radio" name="background" id="background-1" value="1" class="d-none background-radio" checked>
+                            <% } else { %>
+                            <input type="radio" name="background" id="background-1" value="1" class="d-none background-radio">
+                            <% } %>
+                            <label for="background-1" class="background-btn" id="background-label-1"></label>
+                          </div>
+                          <div class="form-group col-sm-6 col-lg-4 col-xl-3">
+                            <%if(currentUser.preferences.background == 2){ %>
+                            <input type="radio" name="background" id="background-2" value="2" class="d-none background-radio" checked>
+                            <% } else { %>
+                            <input type="radio" name="background" id="background-2" value="2" class="d-none background-radio">
+                            <% } %>
+                            <label for="background-2" class="background-btn" id="background-label-2"></label>
+                          </div>
+                          <div class="form-group col-sm-6 col-lg-4 col-xl-3">
+                            <%if(currentUser.preferences.background == 3){ %>
+                            <input type="radio" name="background" id="background-3" value="3" class="d-none background-radio" checked>
+                            <% } else { %>
+                            <input type="radio" name="background" id="background-3" value="3" class="d-none background-radio">
+                            <% } %>
+                            <label for="background-3" class="background-btn" id="background-label-3"></label>
+                          </div>
+                          <div class="form-group col-sm-6 col-lg-4 col-xl-3">
+                            <%if(currentUser.preferences.background == 4){ %>
+                            <input type="radio" name="background" id="background-4" value="4" class="d-none background-radio" checked>
+                            <% } else { %>
+                            <input type="radio" name="background" id="background-4" value="4" class="d-none background-radio">
+                            <% } %>
+                            <label for="background-4" class="background-btn" id="background-label-4"></label>
+                          </div>
+                          <div class="form-group col-sm-6 col-lg-4 col-xl-3">
+                            <%if(currentUser.preferences.background == 5){ %>
+                            <input type="radio" name="background" id="background-5" value="5" class="d-none background-radio" checked>
+                            <% } else { %>
+                            <input type="radio" name="background" id="background-5" value="5" class="d-none background-radio">
+                            <% } %>
+                            <label for="background-5" class="background-btn" id="background-label-5"></label>
+                          </div>
+                          <div class="form-group col-sm-6 col-lg-4 col-xl-3">
+                            <%if(currentUser.preferences.background == 6){ %>
+                            <input type="radio" name="background" id="background-6" value="6" class="d-none background-radio" checked>
+                            <% } else { %>
+                            <input type="radio" name="background" id="background-6" value="6" class="d-none background-radio">
+                            <% } %>
+                            <label for="background-6" class="background-btn" id="background-label-6"></label>
+                          </div>
+                          <div class="form-group col-sm-6 col-lg-4 col-xl-3">
+                            <%if(currentUser.preferences.background == 7){ %>
+                            <input type="radio" name="background" id="background-7" value="7" class="d-none background-radio" checked>
+                            <% } else { %>
+                            <input type="radio" name="background" id="background-7" value="7" class="d-none background-radio">
+                            <% } %>
+                            <label for="background-7" class="background-btn" id="background-label-7"></label>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="card-footer p-0">
+                      <button type="submit" class="btn btn-block btn-primary text-center" form="background" id="background-btn">Update</button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="inactive" id="wallet">
+          <div class="row justify-content-center justify-content-lg-left">
+            <%if(available != undefined){%>
+            <div class="col-10 col-lg-6 col-xl-3">
+              <div class="card">
+                <div class="card-header">
+                  <i class="far fa-money-check-alt fa-lg mr-3"></i>
+                  Account Balance
+                </div>
+                <div class="card-body">
+                  <div class="row text-center">
+                    <div class="col-12">
+                      <p class="h2 text-primary" id="available-balance">
+                        <%if(['AU','CA','HK','NZ','SG','US'].includes(currentUser.address.country.code)){ %>
+                        $
+                        <% } else if(currentUser.address.country.code == 'GB'){ %>
+                        &#163;
+                        <% } else if(currentUser.address.country.code == 'JP'){ %>
+                        &#165;
+                        <% } else { %>
+                        &#8364;
+                        <% } %>
+                        <%if(available > 0){%>
+                        <%=`${(available/100).toFixed(2)}`%>
+                        <% } else { %>
+                        0.00
+                        <% } %>
+                        <small><%=currency.toUpperCase()%></small>
+                      </p>
+                      <% if(reserved_balance > 0){ %>
+                      <p>
+                        <small>We've reserved $<%=(reserved_balance/100).toFixed(2)%> (USD) to cover your open commissions.</small>
+                      </p>
+                      <% } %>
+                    </div>
+                    <div class="col-12">
+                      <%if(available > 0){%>
+                      <button type="button" class="btn btn-primary" id="request-payout" data-toggle="modal" data-target="#payout-modal">Payout Funds</button>
+                      <% } %>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <% } %>
+            <%if(pending != undefined){ %>
+            <div class="col-10 col-lg-6 col-xl-3">
+              <div class="card">
+                <div class="card-header">
+                  <i class="far fa-hand-holding-usd fa-lg mr-3"></i>
+                  Pending Balance
+                </div>
+                <div class="card-body text-center">
+                  <p class="h2 text-primary">
+                    <%if(['AU','CA','HK','NZ','SG','US'].includes(currentUser.address.country.code)){ %>
+                    $
+                    <% } else if(currentUser.address.country.code == 'GB'){ %>
+                    &#163;
+                    <% } else if(currentUser.address.country.code == 'JP'){ %>
+                    &#165;
+                    <% } else { %>
+                    &#8364;
+                    <% } %>
+                    <%if(pending){%>
+                    <%=`${(pending).toFixed(2)}`%>
+                    <% } else { %>
+                    0.00
+                    <% } %>
+                    <small><%=currency.toUpperCase()%></small>
+                  </p>
+                </div>
+              </div>
+            </div>
+            <% } %>
+            <% if(currentUser.isArtist == true){ %>
+            <div class="col-10 col-lg-6 col-xl-3">
+              <div class="card">
+                <div class="card-header">
+                  <i class="far fa-university fa-lg mr-3"></i>
+                  Connected Accounts
+                </div>
+                <div class="card-body text-center">
+                  <section id="external-accounts">
+                    <%if(banks && banks.length > 0){%>
+                      <%for(let acct of banks){%>
+                       <%if(acct.default_for_currency == true){%>
+                       <p>XXXXXXXX<%=acct.last4%> <small>(Default)</small></p>
+                       <% } %>
+                      <% } %>
+                      <%for(let acct of banks){%>
+                        <%if(acct.default_for_currency == false){%>
+                      <p id="external_account-<%=acct.id%>">XXXXXXXX<%=acct.last4%></span><span class="remove-account" data-user="<%=currentUser.stripe.id%>" data-id="<%=acct.id%>" data-url="external_account"><i class="far fa-times text-danger ml-2"></i></span></p>
+                        <% } %>
+                      <% } %>
+                    <% }%>
+                  </section>
+                  <div class="collapse mb-3" id="collapseNewAccount">
+                    <form id="external-collapse" data-country="<%=currentUser.address.country.code%>" data-currency="<%=currency%>">
+                      <label for="account-number">Account Number</label>
+                      <input type="text" class="form-control" name="accountNumber">
+                      <% if (['AU','CA','GB','HK','JP','NZ','SG','US'].includes(currentUser.address.country.code)){ %>
+                      <label for="routing-number">
+                        <% if(currentUser.address.country.code == 'GB'){ %>
+                        Sort Number
+                        <% } else { %>
+                        Routing Number
+                        <% } %>
+                      </label>
+                      <input type="text" class="form-control" name="routingNumber">
+                      <% } %>
+                      <input type="hidden" name="accountID" value="<%=currentUser.stripe.id%>">
+                      <div class="checkbox">
+                        <input id="account-default" type="checkbox">
+                        <label for="account-default">
+                          Default Account
+                        </label>
+                      </div>
+                      <button type="button" class="btn btn-primary btn-sm new-account-btn" data-form="external-collapse">Add Account</button>
+                    </form>
+                  </div>
+                  <button class="btn btn-primary" data-toggle="collapse" data-target="#collapseNewAccount" aria-expanded="false" aria-controls="collapseNewAccount">
+                      Add New Account
+                    </button>
+                </div>
+              </div>
+            </div>
+            <% } %>
+            <% if(cards && cards.length > 0){ %>
+            <div class="col-10 col-lg-6 col-xl-3">
+              <div class="card">
+                <div class="card-header">
+                  <i class="far fa-credit-card-front fa-lg mr-3"></i>
+                  Saved Cards
+                </div>
+                <div class="card-body text-center">
+                  <% for(let card of cards){ %>
+                    <p id="card-<%=card.id%>">
+                      <%if(card.brand == 'American Express'){%>
+                      <i class="fab fa-cc-amex fa-lg fa-fw mr-5"></i>
+                      <% } else if(card.brand == 'Diners Club'){ %>
+                      <i class="fab fa-cc-diners-club fa-lg fa-fw mr-5"></i>
+                      <% }  else { %>
+                      <i class="fab fa-cc-<%=card.brand.toLowerCase()%> fa-lg fa-fw mr-3"></i>
+                      <% } %>
+                      ****<%=card.last4%>
+                      <button type="button" class="remove-account" data-user="<%=currentUser.stripe.customerID%>" data-id="<%=card.id%>" data-url="card"><i class="far fa-times text-danger ml-2"></i></button>
+                    </p>
+                  <% } %>
+                </div>
+              </div>
+            </div>
+            <% } %>
+          </div>
+          <div class="row justify-content-center">
+            <div class="col-10">
+              <div class="card">
+                <div class="card-header pending">
+                   <i class="fal fa-chart-line fa-lg mr-3"></i>
+                      Transactions
+                  <div class="row align-items-end mt-3">
+                    <div class="col-12 col-md-6 col-xl-3">
+                      <span>Search</span>
+                      <div class="input-group">
+                        <span class="input-group-addon">
+                          <i class="far fa-fw fa-search"></i>
+                        </span>
+                        <input type="text" class="form-control" id="search-box" placeholder="Search">
+                      </div>
+                    </div>
+                    <div class="col-12 col-md-6 col-xl-3">
+                      <span>Search by Status</span>
+                      <div class="input-group">
+                        <span class="input-group-addon">
+                          <i class="far fa-fw fa-list-alt"></i>
+                        </span>
+                        <select class="form-control custom-select" id="status">
+                          <option class="status" value="" selected>Status</option>
+                          <option class="status" value="request">Requested</option>
+                          <option class="status" value="accept">Accepted</option>
+                          <option class="status" value="declined">Declined</option>
+                          <option class="status" value="deposit">Deposited</option>
+                          <option class="status" value="preview">Preview Posted</option>
+                          <option class="status" value="previewAccept">Preview Accepted</option>
+                          <option class="status" value="paid">Final Payment Posted</option>
+                          <option class="status" value="final">Final Posted</option>
+                          <option class="status" value="closed">Closed</option>
+                        </select>
+                      </div>
+                    </div>
+                    <div class="col-12 col-md-6 col-xl-3">
+                      <span>Search by Date Range</span>
+                      <div class="input-group">
+                        <span class="input-group-addon">
+                          <i class="far fa-fw fa-calendar-alt"></i>
+                        </span>
+                        <input type="date" class="form-control calendar" id="date-bottom" placeholder="Start Date">
+                      </div>
+                    </div>
+                    <div class="col-12 col-md-6 col-xl-3">
+                      <div class="input-group">
+                        <span class="input-group-addon">
+                          <i class="far fa-fw fa-calendar-alt"></i>
+                        </span>
+                        <input type="date" class="form-control calendar" id="date-top" placeholder="End Date">
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="card-body">
+                  <table class="table table-striped">
+                    <thead>
+                      <tr>
+                        <th>Client</th>
+                        <th>Artist</th>
+                        <th>Comm Type</th>
+                        <th>Status</th>
+                        <th>Last Activity</th>
+                      </tr>
+                    </thead>
+                    <tbody id="search-results">
+                    <% currentUser.transactions.sort((a,b)=>{ %>
+                      <% return b.activity - a.activity; %>
+                    <% });%>
+                    <% currentUser.transactions.forEach((trans)=>{ %>
+                      <%if(currentUser.transactions.indexOf(trans) < 5){ %>
+                      <tr>
+                        <td><a href="/transaction/<%=trans._id%>"><%=trans.client.username%></a></td>
+                        <td><a href="/transaction/<%=trans._id%>"><%=trans.artist.username%></a></td>
+                        <td><a href="/transaction/<%=trans._id%>"><%=trans.type.name%></a></td>
+                        <td><a href="/transaction/<%=trans._id%>">
+                          <%if(trans.status == 'previewAccept'){%>
+                          Preview Accepted
+                          <% } else { %>
+                          <%=trans.status.charAt(0).toUpperCase() + trans.status.slice(1);%>
+                          <% } %>
+                        </a></td>
+                        <td><a href="/transaction/<%=trans._id%>"><%=trans.dates.activity.toDateString()%></a></td>
+                      </tr>
+                      <% } %>
+                    <% }); %>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+            <div class="col-10 col-xl-6">
+              <div class="card">
+                <div class="card-header">
+                  <i class="fal fa-envelope-open-dollar fa-lg mr-3"></i>
+                  Payouts
+                  <p class="text-center mb-0 mt-3">Search by Date Range</p>
+                  <div class="form-row">
+                    <div class="form-group col-xl-6 my-3">
+                      <label for="payout-start-date" class="sr-only">Start Date</label>
+                      <div class="input-group">
+                        <span class="input-group-addon">
+                          <i class="far fa-fw fa-calendar-alt"></i>
+                        </span>
+                        <input type="date" class="form-control payout-search" id="payout-start-date">
+                      </div>
+                    </div>
+                    <div class="form-group col-xl-6 my-3">
+                      <label for="payout-end-date" class="sr-only">End Date</label>
+                      <div class="input-group">
+                        <span class="input-group-addon">
+                          <i class="far fa-fw fa-calendar-alt"></i>
+                        </span>
+                        <input type="date" class="form-control payout-search" id="payout-end-date">
+                      </div>
+                    </div>
+                  </div>
+                  <p class="text-center mb-0">Search by Amount Range</p>
+                  <div class="form-row">
+                    <div class="form-group col-xl-6 my-3">
+                      <label for="payout-start-amount" class="sr-only">Start Amount</label>
+                      <div class="input-group">
+                        <span class="input-group-addon">
+                          <i class="far fa-fw fa-dollar-sign"></i>
+                        </span>
+                        <input type="number" min="0" placeholder="Min" class="form-control payout-search" id="payout-start-amount">
+                      </div>
+                    </div>
+                    <div class="form-group col-xl-6 my-3">
+                      <label for="payout-end-amount" class="sr-only">End Amount</label>
+                      <div class="input-group">
+                        <span class="input-group-addon">
+                          <i class="far fa-fw fa-dollar-sign"></i>
+                        </span>
+                        <input type="number" min="0" placeholder="Max"  class="form-control payout-search" id="payout-end-amount">
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="card-body">
+                  <table class="table table-striped">
+                    <thead>
+                      <tr>
+                        <th>
+                          Date
+                        </th>
+                        <th>
+                          Amount
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody class="text-center" id="payout-data">
+                      
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="inactive" id="analytics">
+          <div class="row justify-content-center justify-content-lg-left">
+            <div class="col-10 col-xl-5 d-none d-md-inline ">
+              <div class="card">
+                <div class="card-header">
+                  <i class="fal fa-user-chart fa-lg mr-3"></i>
+                  You and Your Commissions
+                </div>
+                <div class="card-body">
+                  <div class="row justify-content-center align-items-center">
+                    <div class="col-12 text-center">
+                      <div class="btn-group" role="group" aria-label="Analytic Dates">
+                        <button type="button" class="btn btn-sm btn-primary user-analytic-btn" data-start="<%=date-604800000%>" data-end="<%=date%>">1w</button>
+                        <button type="button" class="btn btn-sm btn-primary user-analytic-btn" data-start="<%=date-2419200000%>" data-end="<%=date%>">4w</button>
+                        <button type="button" class="btn btn-sm btn-primary user-analytic-btn" data-start="<%=date-31449600000%>" data-end="<%=date%>">1y</button>
+                      </div>
+                      <div class="btn-group" role="group" aria-label="Analytic To-Dates">
+                        <button type="button" class="btn btn-sm btn-primary user-analytic-btn" data-start="<%=Date.parse(`${fullDate.month} 1, ${fullDate.year}`)%>" data-end="<%=date%>">MTD</button>
+                        <% if(['January', 'February', 'March'].includes(fullDate.month)){ %>
+                        <button type="button" class="btn btn-sm btn-primary user-analytic-btn" data-start="<%=Date.parse(`January 1, ${fullDate.year}`)%>" data-end="<%=date%>">QTD</button>
+                        <% } else if(['April','May','June'].includes(fullDate.month)){ %>
+                        <button type="button" class="btn btn-sm btn-primary user-analytic-btn" data-start="<%=Date.parse(`April 1, ${fullDate.year}`)%>" data-end="<%=date%>">QTD</button>
+                        <% } else if(['July','August','September'].includes(fullDate.month)){ %>
+                        <button type="button" class="btn btn-sm btn-primary user-analytic-btn" data-start="<%=Date.parse(`July 1, ${fullDate.year}`)%>" data-end="<%=date%>">QTD</button>
+                        <% } else { %>
+                        <button type="button" class="btn btn-sm btn-primary user-analytic-btn" data-start="<%=Date.parse(`October 1, ${fullDate.year}`)%>" data-end="<%=date%>">QTD</button>
+                        <% } %>
+                        <button type="button" class="btn btn-sm btn-primary user-analytic-btn" data-start="<%=Date.parse(`January 1, ${fullDate.year}`)%>" data-end="<%=date%>">YTD</button>
+                      </div>
+                      <div class="btn-group" role="group" aria-label="Analytic Quarters">
+                        <% if(['January','February','March'].includes(fullDate.month)){ %>
+                        <button type="button" class="btn btn-sm btn-primary user-analytic-btn" data-start="<%=Date.parse(`January 1, ${fullDate.year}`)%>" data-end="<%=date%>">Q1</button>
+                        <button type="button" class="btn btn-sm btn-primary user-analytic-btn" data-start="<%=Date.parse(`April 1, ${fullDate.year - 1}`)%>" data-end=<%=Date.parse(`June 30, ${fullDate.year - 1}`)%>>Q2</button>
+                        <button type="button" class="btn btn-sm btn-primary user-analytic-btn" data-start="<%=Date.parse(`July 1, ${fullDate.year - 1}`)%>" data-end=<%=Date.parse(`September 30, ${fullDate.year - 1}`)%>>Q3</button>
+                        <button type="button" class="btn btn-sm btn-primary user-analytic-btn" data-start="<%=Date.parse(`October 1, ${fullDate.year - 1}`)%>" data-end=<%=Date.parse(`December 31, ${fullDate.year - 1}`)%>>Q4</button>
+                        <% } else { %>
+                        <button type="button" class="btn btn-sm btn-primary user-analytic-btn" data-start="<%=Date.parse(`January 1, ${fullDate.year}`)%>" data-end="<%=Date.parse(`March 31, ${fullDate.year}`)%>">Q1</button>
+                        <% } %>
+                        <% if(['April','May','June'].includes(fullDate.month)){ %>
+                        <button type="button" class="btn btn-sm btn-primary user-analytic-btn" data-start="<%=Date.parse(`April 1, ${fullDate.year - 1}`)%>" data-end=<%=date%>>Q2</button>
+                        <button type="button" class="btn btn-sm btn-primary user-analytic-btn" data-start="<%=Date.parse(`July 1, ${fullDate.year - 1}`)%>" data-end=<%=Date.parse(`September 30, ${fullDate.year - 1}`)%>>Q3</button>
+                        <button type="button" class="btn btn-sm btn-primary user-analytic-btn" data-start="<%=Date.parse(`October 1, ${fullDate.year - 1}`)%>" data-end=<%=Date.parse(`December 31, ${fullDate.year - 1}`)%>>Q4</button>
+                        <% } else { %>
+                        <button type="button" class="btn btn-sm btn-primary user-analytic-btn" data-start="<%=Date.parse(`April 1, ${fullDate.year}`)%>" data-end="<%=Date.parse(`June 30, ${fullDate.year}`)%>">Q2</button>
+                        <% } %>
+                        <% if(['July','August','September'].includes(fullDate.month)){ %>
+                        <button type="button" class="btn btn-sm btn-primary user-analytic-btn" data-start="<%=Date.parse(`July 1, ${fullDate.year}`)%>" data-end=<%=date%>>Q3</button>
+                        <button type="button" class="btn btn-sm btn-primary user-analytic-btn" data-start="<%=Date.parse(`October 1, ${fullDate.year - 1}`)%>" data-end=<%=Date.parse(`December 31, ${fullDate.year - 1}`)%>>Q4</button>
+                        <% } else { %>
+                        <button type="button" class="btn btn-sm btn-primary user-analytic-btn" data-start="<%=Date.parse(`July 1, ${fullDate.year}`)%>" data-end="<%=Date.parse(`September 30, ${fullDate.year}`)%>">Q3</button>
+                        <% } %>
+                        <% if(['October','November','December'].includes(fullDate.month)){ %>
+                        <button type="button" class="btn btn-sm btn-primary user-analytic-btn" data-start="<%=Date.parse(`October 1, ${fullDate.year}`)%>" data-end=<%=date%>>Q4</button>
+                        <% }%>
+                      </div>
+                    </div>
+                    <!--<div class="col-12 col-xl-6">-->
+                    <!--  <div class="row">-->
+                    <!--    <div class="col-12 col-md-6">-->
+                    <!--      <label for="analytics-start" class="sr-only">Start Date</label>-->
+                    <!--      <div class="input-group">-->
+                    <!--        <span class="input-group-addon">-->
+                    <!--          <i class="far fa-fw fa-calendar-alt"></i>-->
+                    <!--        </span>-->
+                    <!--        <input type="date" class="form-control calendar" id="anaytics-start" placeholder="Start Date">-->
+                    <!--      </div>-->
+                    <!--    </div>-->
+                    <!--    <div class="col-12 col-md-6">-->
+                    <!--      <label for="analytics-end" class="sr-only">End Date</label>-->
+                    <!--      <div class="input-group">-->
+                    <!--        <span class="input-group-addon">-->
+                    <!--          <i class="far fa-fw fa-calendar-alt"></i>-->
+                    <!--        </span>-->
+                    <!--        <input type="date" class="form-control calendar" id="analytics-end" placeholder="End Date">-->
+                    <!--      </div>-->
+                    <!--    </div>-->
+                    <!--  </div>-->
+                    <!--</div>-->
+                  </div>
+                  <div class="row">
+                    <div class="col-12">
+                       <canvas id="user-analytics-canvas" aria-label="Commission Analytics Chart" role="img"></canvas>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-10 col-xl-5 d-none d-md-inline">
+              <div class="card">
+                <div class="card-header"><i class="fal fa-hand-holding-usd fa-lg mr-3"></i> Your Income</div>
+                <div class="card-body">
+                  <canvas id="money-analytics-canvas" aria-label="Income Analytics Chart" role="img"></canvas>
+                </div>
+              </div>
+            </div>
+            <div class="col-10 d-none d-md-inline">
+              <div class="card">
+                <div class="card-header">
+                  <i class="fal fa-pencil-paintbrush fa-lg mr-3"></i>
+                  Your Artwork
+                </div>
+                <div class="card-body">
+                  <div id="galleryButtonBox">
+                    <% for(let gal of currentUser.gallery){ %>
+                    <button type="button" class="galleryButton" style="background-image:url('<%=gal.image[0].url%>')" data-id="<%=gal._id%>"></button>
+                    <% } %> 
+                  </div>
+                  <canvas id="galleryChart"></canvas>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="inactive" id="commissions">
+          <div class="row align-items-center justify-content-center" id="commission-row">
+            <% currentUser.commissions.forEach((comm)=>{ %>
+              <div class="col-10 col-xl-6" id="<%=comm._id%>">
+                <div class="card comm-card">
+                  <div class="background comm-img" id="<%=comm._id%>-img" style="background-image:url(<%=comm.example.url%>)" ></div>
+                  <h1 class="h5 mb-0 comm-name column-2" id="<%=comm._id%>-name">
+                    <span><%=comm.name%></span>
+                    <span class="ml-3" id="<%=comm._id%>-price">$<%=comm.price/100%></span>
+                    <%if(comm.NSFW == true){%>
+                    <span class="badge badge-pill badge-primary" id="<%=comm._id%>-NSFW">NSFW</span>
+                    <% } %>
+                  </h1>
+                  <%if(comm.available != null){ %>
+                  <h2 class="h5 comm-available column-2" id="<%=comm._id%>-available">
+                    Number Available:
+                    <span id="<%=comm._id%>-available"><%=comm.available%></span>
+                  </h2>
+                  <% } %>
+                  <p class="littleText comm-description column-2" id="<%=comm._id%>-description"><%=comm.description%></p>
+                  <p class="comm-tags column-2" id="<%=comm._id%>-tags">
+                    <% if(comm.tags && comm.tags.length > 0){ %>
+                      <% for(let tag of comm.tags){ %>
+                        <span class="badge badge-primary mx-1">#<%=tag%></span>
+                      <% } %>
+                    <% } %>
+                  </p>
+                  <button type="button" class="btn btn-danger comm-delete" data-id="<%=comm._id%>"onclick="deleteComm(this)">Delete</button>
+                  <button type="button" class="btn btn-primary comm-edit" data-toggle="modal" data-target="#<%=comm._id%>-modal">Edit</button>
+                </div>
+              </div>
+            <% }); %>
+          </div>
+        </div>
+        <div class="inactive" id="social">
+          <div class="row justify-content-center">
+            <div class="col-10 col-md-6 col-xl-3 mb-3 mb-lg-0">
+              <div class="card" id="followers-card">
+                <div class="card-header">
+                  <i class="fal fa-thumbs-up fa-lg mr-3"></i>
+                    Fans
+                  </div>
+                <div class="card-body">
+                  <table class="table table-striped">
+                    <% currentUser.fans.sort((a,b)=>{ %>
+                    <% var usernameA = a.username.toUpperCase; %>
+                    <% var usernameB = b.username.toUpperCase; %>
+                    
+                    <% if (usernameA < usernameB) { %>
+                    <% return -1; %>
+                    <% } %>
+                    <% if (usernameA > usernameB) { %>
+                    <% return 1; %>
+                    <% } %>
+                    <% return 0; %>
+                    <% }); %>
+                    <% currentUser.fans.forEach((follow)=>{ %>
+                    <tr>
+                      <td>
+                        <a href="/<%=follow.username%>">
+                          <div class="row justify-content-center">
+                            <div class="col-6 col-lg-3">
+                            <% if(!follow.profile.url){ %>
+                              <i class="fas fa-user fa-lg mr-3"></i>
+                            <% } else { %>
+                              <div class="rounded-circle follow-img" style="background-image:url('<%=follow.profile.url%>')"></div>
+                            <% } %>
+                            </div>
+                            <div class="col-6 col-lg-9 align-self-center">
+                              <p class="d-inline m-0"><%=follow.username%></p>
+                            </div>
+                          </div> 
+                        </a>
+                      </td>
+                    </tr>
+                    <% }); %>
+                  </table>
+                </div>
+              </div>
+            </div>
+            <div class="col-10 col-md-6 col-xl-3 mb-3 mb-lg-0">
+              <div class="card" id="following-card">
+                <div class="card-header">
+                  <i class="fal fa-user fa-lg mr-3"></i>
+                  Following
+                </div>
+                <div class="card-body">
+                  <table class="table table-striped">
+                    <% currentUser.following.sort((a,b)=>{ %>
+                      <% var usernameA = a.username.toUpperCase(); %>
+                      <% var usernameB = b.username.toUpperCase(); %>
+                      
+                      <% if (usernameA < usernameB) { %>
+                      <% return -1; %>
+                      <% } %>
+                      <% if (usernameA > usernameB) { %>
+                      <% return 1; %>
+                      <% } %>
+                      <% return 0; %>
+                    <% }); %>
+                    <% currentUser.following.forEach((follow)=>{ %>
+                    <tr>
+                      <td>
+                        <a href="/<%=follow.username%>">
+                          <div class="row">
+                            <div class="col-6 col-lg-3 ml-auto justify-contents-center">
+                              <% if(!follow.profile.url){ %>
+                              <i class="fas fa-user fa-lg mr-3"></i>
+                              <% } else { %>
+                              <div class="rounded-circle follow-img" style="background-image:url('<%=follow.profile.url%>')"></div>
+                              <% } %>
+                            </div>
+                            <div class="col-6 col-lg-9 align-self-center">
+                              <p class="d-inline m-0"><%=follow.username%></p>
+                            </div>
+                          </div> 
+                        </a>
+                      </td>
+                    </tr>
+                    <% }); %>
+                  </table>
+                </div>
+              </div>
+            </div>
+            <div class="col-10 col-xl-6">
+              <div class="card" id="review-card">
+                <div class="card-header">
+                  <i class="fal fa-star fa-lg mr-3"></i>
+                  Reviews
+                </div>
+                <div class="card-body">
+                  <table class="table table-striped">
+                    <thead>
+                      <tr>
+                        <th>User</th>
+                        <th>Date</th>
+                        <th>Rating</th>
+                        <th>Review</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                    <% currentUser.transactions.sort((a,b)=>{ %>
+                      <% return b.activity - a.activity; %>
+                    <% });%>
+                    <% currentUser.transactions.forEach((trans)=>{ %>
+                      <%if(trans.review && trans.dates.review < (Date.now()+2629746000)&&trans.artist.username == currentUser.username){%>
+                        <tr>
+                          <td><a href="/transaction/<%=trans._id%>"><%=trans.client.username%></a></td>
+                          <td><a href="/transaction/<%=trans._id%>"><%=trans.dates.review.toDateString()%></a></td>
+                          <td><a href="/transaction/<%=trans._id%>"><%=trans.rating%></a></td>
+                          <td><a href="/transaction/<%=trans._id%>#review-bar">Go to Review</a></td>
+                        </tr>
+                      <% } %>
+                    <% }); %>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+          </div>
+      </main>
+    </div>
+    <div class="modal fade" id="new-comm-modal" tabindex="-1" role="dialog" aria-labelledby="newCommModalLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="newCommModalLabel">Let's Set Something Up!</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true"><i class="far fa-times text-danger"></i></span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <div class="card-body">
+              <div class="spinner inactive" id="new-comm-spinner">
+                <div class="double-bounce1"></div>
+                <div class="double-bounce2"></div>
+              </div>
+              <form action="/dash/commission/new" method="POST" id="new-comm-form" enctype="multipart/form-data">
+                <div class="row">
+                  <div class="col-12">
+                    <h6 class="col-form-label">Example Image</h6>
+                    <div class="row justify-content-center">
+                    <div class="col-12 text-center py-3" id="comm-display">
+                        <i class="fas fa-cloud-upload-alt fa-5x"></i>
+                        <p class="text-muted my-2">Upload Preview</p>
+                    </div>
+                    <label for="comm-input" class="btn btn-primary btn-simple">Upload</label>
+                    <input type="file" class="d-none" id="comm-input" name="commInput" autocomplete="off" accept="image/*">
+                  </div>
+                </div>
+                    <div class="col-12">
+                        <div class="form-group">
+                            <label for="comm-name">Commission Name<span class="text-danger">*</span></label>
+                            <input type="text" required name="commName" class="form-control" id="comm-name" placeholder="Give Your Commission A Name">
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-6">
+                      <label for="comm-price" class="col-form-label">Price in USD<span class="text-danger">*</span> <small><a href="https://www.xe.com/">Check Exchange Rates.</a></small></label>
+                      <div class="input-group border-input">
+                          <input type="number" min="1" name="commPrice" id="comm-price" placeholder="Enter Price" class="form-control border-input" required>
+                          <span class="input-group-addon" style="border-top-right-radius:5px; border-bottom-right-radius: 5px"><i class="fas fa-dollar-sign"></i></span>
+                      </div>
+                    </div>
+                    <div class="col-12 col-md-6">
+                      <label for="comm-available" class="col-form-label">Number Available</label>
+                      <div class="input-group border-input">
+                        <input type="number" min="1" name="commAvail" id="comm-available" placeholder="Limit Availability" class="form-control border-input">
+                        <span class="input-group-addon" style="border-top-right-radius:5px; border-bottom-right-radius: 5px"><i class="fas fa-paint-brush"></i></span>
+                      </div>
+                    </div>
+                    <div class="col-12">
+                      <div class="form-group">
+                        <label for="comm-description">Commission Description<span class="text-danger">*</span></label>
+                        <textarea required class="form-control" name="commDesc" id="comm-description" rows="3" maxlength="150" placeholder="Tell us all about your awesome commission. You've got 150 characters."></textarea>
+                      </div>
+                    </div>
+                    <div class="col-12">
+                      <div class="form-group">
+                        <label for="comm-tags">Tags</label>
+                        <input type="text" class="form-control" id="comm-tags" name="commTags" placeholder="Add your tags with #.">
+                      </div>
+                    </div>
+                    <div class="col-12 col-md-6">
+                      <label for="comm-type">Commission Type<span class="text-danger">*</span></label>
+                      <select class="custom-select" id="comm-type" name="commType">
+                        <!--<option value="animation">Animation</option>-->
+                        <option value="comic">Comic</option>
+                        <option value="craft">Craft</option>
+                        <option value="digital">Digital Art</option>
+                        <option value="graphic_design">Graphic Design</option>
+                        <!--<option value="fiction">Fiction</option>-->
+                        <!--<option value="film">Film</option>-->
+                        <!--<option value="non-fiction">Non-Fiction</option>-->
+                        <option value="photo">Photo</option>
+                        <!--<option value="poetry">Poetry</option>-->
+                        <option value="traditional">Traditional Art</option>
+                      </select>
+                    </div>
+                    <div class="col-12 col-md-6">
+                      <% function getAge(birthDateString) { %>
+                              <% var today = new Date(); %>
+                              <% var birthDate = new Date(birthDateString); %>
+                              <% var age = today.getFullYear() - birthDate.getFullYear(); %>
+                              <% var m = today.getMonth() - birthDate.getMonth(); %>
+                              <% if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) { %>
+                                  <% age--; %>
+                              <% } %>
+                              <% return age; %>
+                          <% } %>
+                      <% if(getAge(currentUser.birthday) >= 18) { %>
+                      <label for="NSFW" class="col-form-label">NSFW</label>
+                      <div class="radio" id="NSFW">
+                          <input type="radio" name="commNSFW" value="yes" id="nsfw-yes">
+                          <label for="nsfw-yes" class="mr-3">Yup.</label>
+                          <input type="radio" name="commNSFW" value="no" id="nsfw-no">
+                          <label for="nsfw-no" class="mr-3">Nope.</label>
+                      </div>
+                      <% } else { %>
+                      <p>Sorry, but you can't offer NSFW content until you're 18. Them's the rules.</p>
+                      <% } %>
+                    </div>
+                </div>
+                <div class="row mt-3">
+                  <div class="col-6">
+                    <button type="button" class="btn btn-danger btn-block" data-dismiss="modal">Close</button>
+                  </div>
+                  <div class="col-6">
+                    <button class="btn btn-primary btn-block noFetch-submit" type="submit">Save</button>
+                    <button id="new-commission-submit" type="button" class="btn btn-primary btn-block fetch-submit inactive">Save</button>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal fade" id="deleteAccount" tabindex="-1" role="dialog" aria-labelledby="deleteLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="deleteLabel">Delete Account</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true"><i class="far fa-times text-danger"></i></span>
+            </button>
+          </div>
+          
+          <div class="modal-body">
+            <% if(currentUser.isArtist == false){ %>
+            <p>
+              We just want to check that you really want to go. Totally up to you. When you press that big, red button down there, everything that we know about you will be gone. Forever. There's no waiting period, no getting it back. 
+            </p>
+            <% } else if(available == 0 && pending == 0) { %>
+            <p>
+              We just want to check that you really want to go. Totally up to you. When you press that big, red button down there, everything that we know about you will be gone. Forever. There's no waiting period, no getting it back. 
+            </p>
+            <p>
+              If you did any commissions, the other party will still have access to the transaction records of those commissions. 
+            </p>
+            <% } else { %>
+            <p>It looks like you still have funds in your account. Please make sure you payout all of those funds into your external account. Then you can close your account.</p>
+            <% } %>
+          </div>
+          <div class="modal-footer">
+            <% if(currentUser.isArtist == false){ %>
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Nevermind.</button>
+            <a href="/dash/user/delete" class="btn btn-danger">Delete Forever.</a>
+            <% } else if(available == 0 && pending == 0){ %>
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Nevermind.</button>
+            <a href="/dash/user/delete" class="btn btn-danger">Delete Forever.</a>
+            <% } else { %>
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <% } %>
+          </div>
+        </div>
+      </div>
+    </div>
+    <% if(currentUser.stripe.fields_needed.includes('legal_entity.ssn_last_4') || currentUser.stripe.fields_needed.includes('legal_entity.personal_id_number') || currentUser.stripe.fields_needed.includes('legal_entity.verification.document') || currentUser.verified.verified == false){ %>
+    <div class="modal fade" id="verify-modal" tabindex="-1" role="dialog" aria-labelledby="verify-label" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="verify-label">Let's Get You Verified!</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true"><i class="far fa-times text-danger"></i></span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <div class="card-body">
+              <div class="row align-items-center justify-content-center" id="verify-buttons">
+                <% if(currentUser.verified.verified == false){ %>
+                <div class="col-12 col-md-3 verify p-3 text-center" data-id="email-verify" id="verify-email">
+                  <p><i class="fal fa-envelope fa-3x"></i></p>
+                  <p class="mb-0">Verify Email</p>
+                </div>
+                <% } %>
+                <%if(currentUser.stripe.fields_needed.includes('legal_entity.verification.document')){ %>
+                <div class="col-12 col-md-3 verify p-3 text-center mx-md-5" data-id="id-verify">
+                  <p><i class="fal fa-address-card fa-3x"></i></p>
+                  <p class="mb-0">Upload<br>ID</p>
+                </div>
+                <% } %>
+                <%if(currentUser.stripe.fields_needed.includes('legal_entity.ssn_last_4') || currentUser.stripe.fields_needed.includes('legal_entity.personal_id_number')){ %>
+                <div class='col-12 col-md-3 verify p-3 text-center mx-md-5' data-id="pid-verify">
+                  <p><i class="fal fa-user fa-3x"></i></p>
+                  <p class="mb-0">ID Number</p>
+                </div>
+                <% } %>
+              </div>
+              <% if(currentUser.verified.verified == false){%>
+              <div class="row justify-content-center inactive" id="email-verify">
+                <div class="col-12">
+                  <p>We've sent a new verification email to <%=currentUser.email%><br>The verification link is active for 24 hours.</p>
+                  <button type="button" class="btn btn-primary btn-sm verify-back" data-area="email-verify">Go Back</button>
+                </div>
+              </div>
+              <% } %>
+              <% if(currentUser.stripe.fields_needed.includes('legal_entity.ssn_last_4') || currentUser.stripe.fields_needed.includes('legal_entity.personal_id_number')){ %>
+              <div class="row justify-content-center inactive" id="pid-verify">
+                <div class="col-12">
+                  <div class="form-group">
+                    <%if(currentUser.address.country.code == 'US'){ %>
+                    <label for="pid-input">Social Security Number</label>
+                    <% } else if(currentUser.address.country.code == 'CA'){ %>
+                    <label for="pid-input">Social Insurance Number</label>
+                    <% } else if(currentUser.address.country.code == 'HK'){ %>
+                    <label for="pid-input">Identity Card Number</label>
+                    <% } else if(currentUser.address.country.code == 'SG'){ %>
+                    <label for="pid-input">National Registration Identity Card (NRIC) or Foreign Identification Number (FIN)</label>
+                    <% } %>
+                    <p><small>We do not save this information, but Stripe does.</small></p>
+                      <input type="text" class="form-control" id="pid-input" name="pid" autocomplete="no">
+                  </div>
+                  <button type="button" class="btn btn-primary btn-sm verify-back mr-3" data-area="pid-verify">Go Back</button>
+                  <button type="button" class="btn btn-primary btn-sm" id="pid-verify-submit">Submit</button>
+                </div>
+              </div>
+              <% } %>
+              <% if(currentUser.stripe.fields_needed.includes('legal_entity.verification.document')){ %>
+              <div class="row justify-content-center inactive" id="id-verify">
+                <div class="col-12 text-center">
+                  <div class="container my-3">
+                    <div class="inactive alert alert-danger alert-dismissible fade show p-3" id="id-alert" role="alert">
+                      <div class="container">
+                        <span id="id-span"></span>
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                          <span aria-hidden="true">
+                            <i class="far fa-times text-white"></i>
+                          </span>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="spinner inactive" id="id-spinner">
+                    <div class="double-bounce1"></div>
+                    <div class="double-bounce2"></div>
+                  </div>
+                  <div class="p-5" id="id-preview"></div>
+                  <button type="button" class="btn btn-primary btn-sm inactive" id="id-verify-submit">Submit</button>
+                  <form id="id-verification">
+                    <h6 class="col-form-label mt-3">Upload Identification Image</h6>
+                      <i class="fas fa-cloud-upload-alt fa-5x text-white"></i>
+                      <p class="text-muted my-2">Upload ID Document</p>
+                    <label for="verify-input" class="btn btn-primary btn-simple">Upload</label>
+                    <input type="file" class="d-none" id="verify-input" name="verifyInput" autocomplete="off" accept="image/jpg, image/jpeg, image/png" multiple>
+                    <p><small>Verification Documents need to be uploaded in color as a JPEG or PNG that is smaller than 5MB. If you need to provide the front and back of the ID, please select the front first and then the back.</small></p>
+                    <% let country = currentUser.address.country.code;%>
+                    <% if(['au','at','ca','fr','nl','sg'].includes(country)){%>
+                    <p><small>While a Passport is always preferred, acceptable forms of ID are a Passport, Government-Issued ID (Front and Back), or a Driver's License (Front and Back).</small></p>
+                    <% } else if(['dk','fi','de','ie','it','lu','pt','es','ch','uk'].includes(country)){ %>
+                    <p><small>While a Passport is always preferred, acceptable forms of ID are a Passport, Government-Issued ID (Front and Back), or a Driver's License.</small></p>
+                    <% } else if(country == 'be'){ %>
+                    <p><small>While a Passport is always preferred, acceptable forms of ID are a Passport, Government-Issued ID, or a Driver's License.</small></p>
+                    <% } else if(country == 'hk'){ %>
+                    <p><small>While a Passport is always preferred, you can also upload a Government-Issued ID.</small></p>
+                    <% } else if(country == 'no'||country == 'se'||country == 'nz'){ %>
+                    <p><small>While a Passport is always preferred, you can also upload a Driver's License (Front and Back in New Zealand).</small></p>
+                    <% } else if(country == 'us'){ %>
+                    <p><small>While a Passport is always preferred, acceptable forms of ID are a Passport, Government-Issued ID, or a Driver's License (Front and Back).</small></p>
+                    <% } else if(country == 'jp'){ %>
+                    <p><small>While a Passport is always preferred, acceptable forms of ID are a Passport, Juki card(with Photo; Front and Back), Driver's License (Front and Back), Foreign Nationals Residence Card (Front and Back), or Health Insurance Card with Certificate of Residence or National Pension Notebook.</small></p>
+                    <% } %>
+                  </form>
+                </div>
+                <button type="button" class="btn btn-primary btn-sm verify-back text-center" data-area="id-verify">Go Back</button>
+              </div>
+              <% } %>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <% } %>
+    <% if(currentUser.isArtist == true && currentUser.stripe.fields_needed.includes('external_account')){ %>
+    <div class="modal fade" id="external-account-modal" tabindex="-1" role="dialog" aria-labelledby="external-account-label" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="external-account-label">Add an External Account.</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true"><i class="far fa-times text-danger"></i></span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <div class="spinner inactive" id="external-account-spinner">
+                <div class="double-bounce1"></div>
+                <div class="double-bounce2"></div>
+              </div>
+            <form id="external-modal" data-country="<%=currentUser.address.country.code%>" data-currency="<%=currency%>">
+              <label for="account-number">Account Number</label>
+              <input type="text" class="form-control" name="accountNumber">
+              <% if (['AU','CA','GB','HK','JP','NZ','SG','US'].includes(currentUser.address.country.code)){ %>
+                <label for="routing-number">
+                  <% if(currentUser.address.country.code == 'GB'){ %>
+                  Sort Number
+                  <% } else { %>
+                  Routing Number
+                  <% } %>
+                </label>
+                <input type="text" class="form-control" name="routingNumber">
+              <% } %>
+              <input type="hidden" name="accountID" value="<%=currentUser.stripe.id%>">
+              <div class="checkbox mt-3">
+                <input id="external_default" type="checkbox">
+                <label for="external_default">
+                  Default Account
+                </label>
+              </div>
+              <%if(['AT','BE','DK','FN','FR','DE','IE', 'IT','LU','NL','NO','PT','ES','SE','CH']){ %>
+              <input type="hidden" name="accountName" value="<%=`${currentUser.name.given} ${currentUser.name.surname}`%>">
+              <input type="hidden" name="accountEmail" value="<%=currentUser.email%>">
+              <% } %>
+              <button type="button" class="btn btn-primary btn-sm new-account-btn" data-form="external-modal" data-modal="external-account-modal" data-spinner="external-account-spinner">Add Account</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+    <% } %>
+    <% for(let comm of currentUser.commissions){ %>
+    <div class="modal fade" id="<%=comm._id%>-modal" tabindex="-1" role="dialog" aria-labelledby="<%=comm._id%>Label" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="<%=comm._id%>Label">Edit <%=comm.name%></h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true"><i class="far fa-times text-danger"></i></span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <div class="card-body">
+              <div class="spinner inactive" id="<%=comm._id%>-edit-spinner">
+                <div class="double-bounce1"></div>
+                <div class="double-bounce2"></div>
+              </div>
+              <form action="/dash/commission/<%=comm._id%>/edit" method="POST" class="edit" id="<%=comm._id%>-edit-form" enctype="multipart/form-data">
+                <div class="row">
+                  <div class="col-12">
+                    <h6 class="col-form-label">Example Image</h6>
+                    <div class="row justify-content-center">
+                    <div class="col-12 text-center py-3" id="<%=comm._id%>-edit-display">
+                        <img class="img-fluid" src="<%=comm.example.url%>">
+                    </div>
+                    <label for="<%=comm._id%>-edit-input" class="btn btn-primary btn-simple">Upload</label>
+                    <input type="file" class="d-none" id="<%=comm._id%>-edit-input" data-display="<%=comm._id%>-edit-display" data-input="<%=comm._id%>-edit-input" oninput="editCommExample(this)" name="editInput" accept="image/*">
+                  </div>
+                    </div>
+                  <div class="col-12">
+                    <div class="form-group">
+                      <label for="<%=comm._id%>-edit-name">Commission Name<span class="text-danger">*</span></label>
+                      <input type="text" required name="editName" class="form-control" id="<%=comm._id%>-edit-name" placeholder="Give Your Commission A Name" value="<%=comm.name%>">
+                    </div>
+                  </div>
+                  <div class="col-12 col-md-6">
+                    <label for="comm-price" class="col-form-label">Price in USD <small><a href="https://www.xe.com/">Check XE for exchange rates.</a></small><span class="text-danger">*</span></label>
+                    <div class="input-group">
+                      <input type="number" min="1" name="commPrice" id="<%=comm._id%>-edit-price" class="form-control" value="<%=comm.price/100%>" required>
+                      <span class="input-group-addon"><i class="fas fa-dollar-sign"></i></span>
+                    </div>
+                  </div>
+                  <div class="col-12 col-md-6">
+                    <label for="<%=comm._id%>-edit-available" class="col-form-label">Number Available</label>
+                    <div class="input-group border-input">
+                      <input type="number" min="1" name="editAvail" id="<%=comm._id%>-edit-available" class="form-control border-input" value="<%=comm.available%>">
+                      <span class="input-group-addon" style="border-top-right-radius:5px; border-bottom-right-radius: 5px"><i class="fas fa-paint-brush"></i></span>
+                    </div>
+                  </div>
+                  <div class="col-12">
+                    <div class="form-group">
+                      <label for="comm-description">Commission Description<span class="text-danger">*</span></label>
+                      <textarea required class="form-control" name="editDesc" id="<%=comm._id%>-edit-description" rows="3" maxlength="150" placeholder="Tell us all about your awesome commission. You've got 150 characters."><%=comm.description%></textarea>
+                    </div>
+                  </div>
+                  <div class="col-12">
+                    <div class="form-group">
+                      <label for="<%=comm._id%>-edit-tags">Tags</label>
+                      <input type="text" class="form-control" id="<%=comm._id%>-edit-tags" name="edit-tags" value="<%=comm.tags.join(' #')%>" placeholder="Tags">
+                    </div>
+                  </div>
+                  <div class="col-12 col-md-6">
+                    <label for="<%=comm._id%>-edit-type">Commission Type<span class="text-danger">*</span></label>
+                    <select class="custom-select" id="<%=comm._id%>-edit-type" name="editType">
+                      <option selected value="<%=comm.type%>"><%=`${comm.type[0].toUpperCase()}${comm.type.slice(1)}`%></option>
+                      <!--<option value="animation">Animation</option>-->
+                      <option value="comic">Comic</option>
+                      <option value="craft">Craft</option>
+                      <option value="digital">Digital Art</option>
+                      <option value="graphic_design">Graphic Design</option>
+                      <!--<option value="fiction">Fiction</option>-->
+                      <!--<option value="film">Film</option>-->
+                      <!--<option value="non-fiction">Non-Fiction</option>-->
+                      <option value="photo">Photo</option>
+                      <!--<option value="poetry">Poetry</option>-->
+                      <option value="traditional">Traditional Art</option>
+                    </select>
+                  </div>
+                  <div class="col-12 col-md-6">
+                    <% if(!NSFW || NSFW == false){ %>
+                    <p>Sorry, but you can't offer NSFW content until you're 18. Them's the rules.</p>
+                    <% } else { %>
+                    <label for="NSFW" class="col-form-label">NSFW</label>
+                    <div class="radio" id="NSFW">
+                      <%if(comm.NSFW == true){ %>
+                        <input type="radio" name="editNSFW" value="yes" id="<%=comm._id%>-edit-nsfw-yes" checked>
+                        <label for="<%=comm._id%>-edit-nsfw-yes" class="mr-3">Yup.</label>
+                        <input type="radio" name="editNSFW" value="no" id="<%=comm._id%>-edit-nsfw-no">
+                        <label for="<%=comm._id%>-edit-nsfw-no" class="mr-3">Nope.</label>
+                      <% } else { %>
+                        <input type="radio" name="editNSFW" value="yes" id="<%=comm._id%>-edit-nsfw-yes">
+                        <label for="<%=comm._id%>-edit-nsfw-yes" class="mr-3">Yup.</label>
+                        <input type="radio" name="editNSFW" value="no" id="<%=comm._id%>-edit-nsfw-no" checked>
+                        <label for="<%=comm._id%>-edit-nsfw-no" class="mr-3">Nope.</label>
+                      <% } %>
+                    </div>
+                    <% } %>
+                  </div>
+                </div>
+                <div class="row mt-3">
+                  <div class="col-6">
+                    <button type="button" class="btn btn-danger btn-block" data-dismiss="modal">Close</button>
+                  </div>
+                  <div class="col-6">
+                    <button type="submit" class="btn btn-primary btn-block noFetch-submit" >Save </button>
+                    <button id="<%=comm._id%>-edit-submit" type="button" class="btn btn-primary btn-block fetch-submit inactive" data-id="<%=comm._id%>" onclick="editComm(this)">Save</button>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <% } %>
+    <div class="modal fade" id="passModal" tabindex="-1" role="dialog" aria-labelledby="passModalLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="passModalLabel">Password Change</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true"><i class="far fa-times text-danger"></i></span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <p>Enter your new password below.</p>
+            <p>Remember, passwords must:</p>
+            <ul>
+              <li class="ml-5">Be at least 8 characters</li>
+              <li class="ml-5">Have an uppercase</li>
+              <li class="ml-5">Have a number</li>
+            </ul>
+            <form action="/dash/password" method="POST" id="passChangeForm">
+              <div class="input-group mb-3">
+                <span class="input-group-addon">
+                  <i class="far fa-fw fa-key"></i>
+                </span>
+                <input type="password" name="passChange" class="form-control" id="passChange" placeholder="Enter your new password.">
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button type="submit" class="btn btn-primary" form="passChangeForm">Update Password</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <% if(available != undefined && available > 0){ %>
+    <div class="modal fade" id="payout-modal" tabindex="-1" role="dialog" aria-labelledby="payoutLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="payoutLabel">Request Payout</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true"><i class="far fa-times text-danger"></i></span>
+            </button>
+          </div>
+          <div id="before-payout">
+            <div class="modal-body">
+              <div class="spinner inactive" id="payout-spinner">
+                <div class="double-bounce1"></div>
+                <div class="double-bounce2"></div>
+              </div>
+              <label for="payout-amount">Requested Amount (Available: $<%=(available/100).toFixed(2)%>)</label>
+              <div class="row justify-content-center">
+                <div class="col-6">
+                  <div class="input-group">
+                    <span class="input-group-addon">
+                      <i class="far fa-fw fa-dollar-sign fa-2x text-primary"></i>
+                    </span>
+                    <input type="number" class="form-control" id="payout-amount" name="payout_amount" min="1" max="<%=(available/100).toFixed(2)%>" step=".01" autocomplete="off">
+                  </div>
+                </div>
+              </div>
+              <p class="text-danger inactive" id="payout-alert">That is more than your available balance.</p>
+              <% if(banks.length > 1){ %>
+              <% for(let acct of banks){ %>
+							<div class="custom-control custom-radio">
+                <input type="radio" id="account-<%=acct.id%>" name="external_accounts" class="custom-control-input" value="<%=acct.id%>">
+                <label class="custom-control-label" for="account-<%=acct.id%>">****<%=acct.last4%></label>
+              </div>
+              <% } %>
+              <% } %>
+              <p>
+                <small>
+                  Payouts are limited to $3,000.00(USD) per request. Please allow a few business days for funds to appear in your account. You may only request a payout up to the amount you currently have available.
+                </small>
+              </p>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Nevermind</button>
+              <button type="button" class="btn btn-info" id="payout-button" data-external_account="<%=banks[0].id%>" data-stripe_account="<%=account.id%>">Request Payout</button>
+            </div>
+          </div>
+          <div class="inactive" id="after-payout">
+            <div class="modal-body">
+              <div class="row justify-content-center text-center">
+                <div class="col-12">
+                  <div class="row">
+                    <div class="col-12 p-3 bg-primary mb-3">
+                      <h2 class="text-white mb-0">Payout Confirmation</h2>
+                    </div>
+                    <div class="col-12">
+                      <p class="text-muted"><small>Accepted On: <span id="payout-accepted"></span></small></p>
+                    </div>
+                    <div class="col-12">
+                      <hr>
+                    </div>
+                    <div class="col-12 col-md-6">
+                      <p>Payout Amount</p>
+                      <p id="paid-amount"></p>
+                    </div>
+                    <div class="col-12 col-md-6">
+                      <p>Payout Account</p>
+                      <p><i class="far fa-university fa-lg mr-3" id="card-icon"></i>****<%=banks[0].last4%></p>
+                    </div>
+                  </div>
+                  <p><small class="text-muted">Payout ID: <span id="payout-id"></span></small></p>
+                </div>
+              </div>
+              <p class="text-center"><small>Please allow two business days for the payout to arrive in your account.</small></p>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-info mx-auto" data-dismiss="modal">All Done</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <% } %>
+    <% if(missingInfo == true){ %>
+    <div class="modal fade" id="more-info-modal" tabindex="-1" role="dialog" aria-labelledby="infoLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="infoLabel">Update Artist Info</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true"><i class="far fa-times text-info"></i></span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <form method="POST" action="/dash/user/missing_info" id="missing-info-form">
+              <div class="form-row">
+                <div class="form-group col-md-6">
+                  <label for="given-name">Given Name <span class="text-danger">*</span></label>
+                  <input type="text" class="form-control" id="given-name" name="givenName" value="<%=currentUser.name.given%>" required>
+                </div>
+                <div class="form-group col-md-6">
+                  <label for="surname">Surname <span class="text-danger">*</span></label>
+                  <input type="text" class="form-control" id="surname" name="surname" value="<%=currentUser.name.surname%>" required>
+                </div>
+              </div>
+              <%if(!currentUser.birthday){ %>
+              <div class="form-group">
+                <label for="birthdate">Birthdate <span class="text-danger">*</span></label>
+                <input type="date" class="form-control" id="birthdate" name="birthdate">
+              </div>
+              <% } else { %>
+              <input type="hidden" name="birthdate" value="<%=currentUser.birthday%>">
+              <% } %>
+              <div class="form-row">
+                <div class="form-group col-md-12">
+                  <label for="street">Street <span class="text-danger">*</span></label>
+                  <input type="text" class="form-control" id="street" name="street" value="<%=currentUser.address.line1%>" required>
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group col-md-12">
+                  <label for="suite">Apartment / Suite</label>
+                  <input type="text" class="form-control" id="suite" name="suite" value="<%=currentUser.address.line2%>">
+                </div>
+              </div>
+              <%if(['au','ca','us'].includes(currentUser.address.country.code)){%>
+              <div class="form-row">
+                <div class="form-group col-md-4">
+                  <label for="city">City <span class="text-danger">*</span></label>
+                  <input type="text" class="form-control" id="city" name="city" value="<%=currentUser.address.city%>">
+                </div>
+                <div class="form-group col-md-4">
+                  <label for="state">State <span class="text-danger">*</span></label>
+                  <select class="custom-select w-100" id="state" name="state">
+                    <% if(currentUser.address.state.code){ %>
+                    <option selected value="<%=currentUser.address.state.code%>"><%=currentUser.address.state.name%></option>
+                    <% } %>
+                    <% let stateKeys = Object.keys(states[currentUser.address.country.code.toUpperCase()]);%>
+                    <% for(let key of stateKeys){ %>
+                    <option value="<%=key%>"><%=states[currentUser.address.country.code.toUpperCase()][key]%></option>
+                    <% } %>
+                  </select>
+                </div>
+                <div class="form-group col-md-4">
+                  <label for="post">Postcode <span class="text-danger">*</span></label>
+                  <input type="text" class="form-control" id="post" name="post" value="<%=currentUser.address.post%>">
+                </div>
+              </div>
+              <% } else { %>
+              <div class="form-row">
+                <div class="form-group col-md-6">
+                  <label for="city">City <span class="text-danger">*</span></label>
+                  <input type="text" class="form-control" id="city" name="city" value="<%=currentUser.address.city%>">
+                </div>
+                <div class="form-group col-md-6">
+                  <label for="post">Postcode <span class="text-danger">*</span></label>
+                  <input type="text" class="form-control" id="post" name="post" value="<%=currentUser.address.post%>">
+                </div>
+              </div>
+              <% } %>
+              <p class="text-center"><small>By registering for an artist account, you agree to our <a href='/legal/tos' class="text-info">Terms of Service Agreement</a> and the <br> <a href="https://stripe.com/us/connect-account/legal" class="text-info">Stripe Connected Account Agreement</a>.</small></p>
+              <input type="hidden" name="country" value="<%=currentUser.address.country.code%>">
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="submit" class="btn btn-info mx-auto" form="missing-info-form">Update</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <% } %>
+  </body>
+  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js" integrity="sha384-cs/chFZiN24E4KMATLdqdvsezGxaGsi4hLGOzlXwp5UZB1LY//20VyM2taTB4QvJ" crossorigin="anonymous"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js" integrity="sha384-uefMccjFJAIv6A+rW+L4AHf99KvxDjWSu1z9VI8SKNVmz4sk7buKt/6v9KI65qnm" crossorigin="anonymous"></script>
+  <script src="/now/js/now-ui-kit.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.3.5/cropper.min.js"></script>
+  <script src="/js/main.js" type="text/javascript"></script>
+  <script src="/js/dash.js" type="text/javascript"></script>
+  <script src="/js/dashSearch.js" type="text/javascript"></script>
+  <% if(currentUser.isArtist == true){%>
+  <script src="/js/accountsAndPayments.js" type="text/javascript"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.3/Chart.bundle.min.js" type="text/javascript"></script>
+  <script src="/js/analytics.js" type="text/javascript"></script>
+  <% } %>
+</html>

@@ -1,0 +1,77 @@
+<section class="inactive" id="social">
+  <% if(user.fans.length > 0){ %>
+  <article class="block" id="fans">
+    <h2 class="block-name"><i class="fal fa-thumbs-up fa-lg fa-fw"></i>Fans</h2>
+    <!--<table class="table table-striped">-->
+      <% currentUser.fans.sort((a,b)=>{ %>
+      <% var usernameA = a.username.toUpperCase; %>
+      <% var usernameB = b.username.toUpperCase; %>
+      
+      <% if (usernameA < usernameB) { %>
+      <% return -1; %>
+      <% } %>
+      <% if (usernameA > usernameB) { %>
+      <% return 1; %>
+      <% } %>
+      <% return 0; %>
+      <% }); %>
+      <div class="fan-button-holder">
+      <% for(let fan of user.fans){ %>
+      <a href="/<%=fan.username%>" class="fan-button">
+        <% if(!fan.profile.url){ %>
+        <i class="fas fa-user fa-lg"></i>
+        <% } else { %>
+        <div class="rounded-circle follow-img" style="background-image:url('<%=fan.profile.url%>')"></div>
+        <% } %>
+        <p class="d-inline m-0"><%=fan.username%></p>
+      </a>
+      <% } %>
+    </div>
+  </article>
+  <% } %>
+  <% if(user.following.length > 0){ %>
+  <article class="block" id="following">
+    <h2 class="block-name"><i class="fal fa-pencil-paintbrush fa-lg fa-fw"></i>Following</h2>
+    <div class="fan-button-holder">
+      <% for(let follower of user.following){ %>
+      <a href="/<%=follower.username%>" class="fan-button">
+        <% if(!follower.profile.url){ %>
+        <i class="fas fa-user fa-lg"></i>
+        <% } else { %>
+        <div class="rounded-circle follow-img" style="background-image:url('<%=follower.profile.url%>')"></div>
+        <% } %>
+        <p class="d-inline m-0"><%=follower.username%></p>
+      </a>
+      <% } %>
+    </div>
+  </article>
+  <% } %>
+  <% if(user.completed.length > 0){ %> 
+  <article class="block card" id="reviews">
+    <h2 class="block-name"><i class="fal fa-star fa-lg fa-fw"></i>Reviews</h2>
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>User</th>
+          <th>Date</th>
+          <th>Rating</th>
+        </tr>
+      </thead>
+      <tbody>
+      <% user.transactions.sort((a,b)=>{ %>
+        <% return b.activity - a.activity; %>
+      <% });%>
+      <% user.transactions.forEach((trans)=>{ %>
+        <%if(trans.review && trans.dates.review < (Date.now()+2629746000)&&trans.artist.username == user.username){%>
+          <tr>
+            <td><a href="/transaction/<%=trans._id%>"><%if(trans.client){%><%=trans.client.username%><%}%></a></td>
+            <td><a href="/transaction/<%=trans._id%>"><%=datify(trans.dates.review, "US")%></a></td>
+            <td><a href="/transaction/<%=trans._id%>"><%=trans.rating%></a></td>
+          </tr>
+        <% } %>
+      <% }); %>
+      </tbody>
+    </table>
+  </article>
+  <% } %>
+</section>

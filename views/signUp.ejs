@@ -1,0 +1,77 @@
+<% include partials/header %>
+  <div id="bar">
+    <div class="background" id="image"></div>
+    <h1>Welcome to Splatr.</h1>
+    <form action="/register" method="POST" id="register-form">
+      <div class="card">
+        <div class="card-header">
+          <p>
+            Sign Up With
+          </p>
+          <a class="btn btn-icon btn-round btn-facebook mr-2" href="/auth/facebook">
+            <i class="fab fa-facebook-f fa-fw fa-lg mt-2"></i>
+          </a>
+          <a class="btn btn-icon btn-round btn-twitter mr-2" href="/auth/twitter">
+            <i class="fab fa-twitter fa-fw fa-lg mt-2"></i>
+          </a>
+          <a class="btn btn-icon btn-round btn-google" href="/auth/google">
+            <i class="fab fa-google fa-fw fa-lg mt-2"></i>
+          </a>
+        </div>
+        <div class="card-body">
+          <form action="/register" method="POST" id="register-form">
+            <%if(error&& error.length > 0){ %>
+            <div class="container my-3">
+              <div class="alert alert-danger alert-dismissible fade show p-3" role="alert">
+                <div class="container">
+                  <strong><%=error%></strong>
+                  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">
+                        <i class="far fa-times text-white"></i>
+                    </span>
+                  </button>
+                </div>
+              </div>
+            </div>
+            <% } %>
+            <div class="form-group">
+              <label for="email">Email <span class="text-danger">*</span></label>
+              <div class="input-group">
+                <div class="input-group-prepend">
+                  <span class="input-group-text">
+                    <i class="far fa-envelope fa-fw fa-lg"></i>
+                  </span>
+                </div>
+                <input type="email" class="form-control" id="email" name="email" required>
+              </div>
+              <label for="username">Username <span class="text-danger">*</span></label>
+              <div class="input-group" data-toggle="tooltip" data-placement="right" data-container="body" data-original-title="You can use most any characters. Please don't use spaces.">
+                <div class="input-group-prepend">
+                  <span class="input-group-text">
+                    <i class="far fa-user fa-fw fa-lg"></i>
+                  </span>
+                </div>
+                <input type="text" class="form-control" id="username" name="username" required>
+              </div>
+              <label for="password">Password <span class="text-danger">*</span></label>
+              <div class="input-group" data-toggle="tooltip" data-placement="right" title data-container="body" data-animation="true" data-original-title="Passwords need to be at least 6 characters. Make sure to include a number and a capital letter.">
+                <div class="input-group-prepend">
+                  <span class="input-group-text">
+                    <i class="far fa-key fa-fw fa-lg"></i>
+                  </span>
+                </div>
+                <input type="password" class="form-control btn-tooltip" id="password" name="password" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,}" minlength="6" required>
+              </div>
+              <label for="honeypot" class="sr-only">Please don't fill this out. It's meant for bots.</label>
+              <input class="d-none" type="text" id="honeypot" name="honeypot" placeholder="don't fill me in">
+              <p><small>By clicking the button, you agree to our<br> <a href="/legal/tos" class="text-success">Terms of Service</a></small></p>
+              <button type="submit" class="btn btn-primary btn-block" form="register-form">Welcome!</button>
+              <p class="text-center mt-3"><strong>Already a member? <a href="/login" class="text-primary">Log In!</a></strong></p>
+            </div>
+          </form>
+        </div>
+      </div>
+    </form>
+    <p id="credit">Photo by <a href="https://unsplash.com/photos/D_ri9CDygBo">Louis Amal on Unsplash</a></p>
+  </div>
+<% include partials/footer %>

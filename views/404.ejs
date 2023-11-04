@@ -1,0 +1,19 @@
+<% include partials/header %>
+<div id="block">
+  <div id="text">
+    <a href="/">
+      <img src="https://ayizan.blob.core.windows.net/ayizanlogos/Logos/Splatr Purple.svg" alt="Splatr Purple Splat Logo">
+    </a>
+    <h1 class="text-primary">404.</h1>
+    <p class="text-success h3 mb-5">We're not sure what you're looking for, but it's not here.<br>Maybe we can get you headed in the right direction.</p>
+    <div id="button-area">
+      <!--<a href="/search" class="nav-link sign-up m-3">Search</a>-->
+      <a href="/register" class="nav-link sign-up m-3">Sign Up for Splatr</a>
+      <a href="/faq" class="nav-link sign-up m-3">FAQs</a>
+      <%if(currentUser){ %>
+      <a href="/dash" class="nav-link sign-up m-3">Your Dashboard</a>
+      <% } %>
+    </div>
+  </div>
+</div>
+<% include partials/footer %>

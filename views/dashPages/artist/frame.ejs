@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title><%=title%> | Splatr. Make more. Share more.</title>
+    <link rel="icon" href="https://ayizan.blob.core.windows.net/site-images/Splatr Icon.png" type="image/png">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
+    <link rel="stylesheet" href="/now/sass/now-ui-kit.css">
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/dash/frame.css">
+    <% if(currentUser.preferences.night == true){ %>
+      <link rel="stylesheet" href="/css/dash/frame-night.css">
+    <% } %>
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:700,400|Roboto" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.3.5/cropper.min.css">
+    <link rel="stylesheet" href="/css/dash/home.css" type="text/css">
+    <link rel="stylesheet" href="/css/dash/commissions.css" type="text/css">
+    <link rel="stylesheet" href="/css/dash/notifications.css" type="text/css">
+    <link rel="stylesheet" href="/css/dash/transactions.css" type="text/css">
+    <link rel="stylesheet" href="/css/dash/financials.css" type="text/css">
+    <link rel="stylesheet" href="/css/dash/social.css" type="text/css">
+    <link rel="stylesheet" href="/css/dash/settings.css" type="text/css">
+    <!--<link rel="stylesheet" href="/css/dash/analytics.css" type="text/css">-->
+    <script type="text/javascript" src="/js/all.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/algoliasearch/3/algoliasearchLite.min.js"></script>
+    <script src="https://js.stripe.com/v3/" type="text/javascript"></script>
+  </head>
+  <% if(user.preferences.dash_background){ %>
+  <style>
+    <%if(user.preferences.dash_background[0] == "#"){ %>
+    main {
+      background: <%=user.preferences.dash_background%>;
+    }
+    <% } else { %>
+      main {
+        background-image: linear-gradient(to bottom, rgba(0,0,0,.75), rgba(67,67,67,.75)), 
+                          url("<%=user.preferences.dash_background%>");
+      }
+    <% } %>
+  </style>
+  <% } %>
+  <body>
+    <% include ../../partials/feedback %>
+    <input type="hidden" id="userKey" value="<%=user.searchKey%>">
+    <div class="modal fade" id="comm-modal" tabindex="-1" role="dialog" aria-labelledby="comm-modal-label" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="comm-modal-label"><span class="comm-name">Let's Set Something Up</span></h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true"><i class="far fa-times"></i></span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <div class="spinner inactive" id="comm-spinner">
+              <div class="double-bounce1"></div>
+              <div class="double-bounce2"></div>
+            </div>
+            <form id="comm-form">
+              <div class="upload" id="comm-example-upload" data-multiple="false">
+                <i class="far fa-cloud-upload-alt fa-5x"></i>
+                <p>Drag your example image here or click the button to upload.</p>
+                <div id="preview-images"></div>
+                <label for="comm-example-input" id="comm-example-label" class="btn btn-simple btn-sm">Upload</label>
+                <input type="file" id="comm-example-input" name="images" class="d-none ref-input" accept="image/*">
+              </div>
+              <div class="form-group full">
+                <label for="comm-name">Commission Name<span class="text-danger ml-1">*</span></label>
+                <input type="text" id="comm-name" class="form-control" required>
+              </div>
+              <div class="form-group">
+                <label for="comm-price">Price in USD<span class="text-danger ml-1">*</span><span class="ml-3"><small><a href="https://xe.com">Check Exchange Rates</a></small></span></label>
+                <div class="input-group">
+                  <input type="number" min="1" class="form-control" id="comm-price">
+                  <div class="input-group-append">
+                    <span class="input-group-text">
+                      <i class="fas fa-dollar-sign fa-fw"></i>
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="comm-available">
+                  Number Available
+                </label>
+                <div class="input-group">
+                  <input type="number" class="form-control" id="comm-available">
+                  <div class="input-group-append">
+                    <span class="input-group-text">
+                      <i class="fas fa-paint-brush fa-fw"></i>
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <div class="form-group full">
+                <label for="comm-description">Commission Description<span class="text-danger ml-1">*</span></label>
+                <textarea class="form-control" id="comm-description" max="150" required placeholder="Tell us about your awesome commission. You've got 150 characters."></textarea>
+              </div>
+              <div class="form-group full">
+                <label for="comm-tags">Tags <small class="ml-3">(Add Tags with #)</small></label>
+                <div class="input-group">
+                  <input type="text" class="form-control" id="comm-tags">
+                  <div class="input-group-append">
+                    <span class="input-group-text">
+                      <i class="fas fa-tags fa-fw"></i>
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="comm-type">Commission Type<span class="text-danger ml-1">*</span></label>
+                <select class="custom-select" id="comm-type">
+                  <option selected disabled value="">Select Type</option>
+                  <!--<option value="animation">Animation</option>-->
+                    <option value="comic">Comic</option>
+                    <option value="craft">Craft</option>
+                    <option value="digital">Digital Art</option>
+                    <option value="graphic_design">Graphic Design</option>
+                    <!--<option value="fiction">Fiction</option>-->
+                    <!--<option value="film">Film</option>-->
+                    <!--<option value="non-fiction">Non-Fiction</option>-->
+                    <option value="photo">Photo</option>
+                    <!--<option value="poetry">Poetry</option>-->
+                    <option value="traditional">Traditional Art</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="comm-nsfw">NSFW?<span class="text-danger ml-1">*</span></label>
+                <% if(NSFW == false){ %>
+                <p>Sorry, you must be over 18 to offer NSFW content.</p>
+                <% } else { %>
+                <div class="radio" id="NSFW">
+                  <input type="radio" name="commNSFW" value="yes" id="nsfw-yes">
+                  <label for="nsfw-yes" class="mr-3">Yup.</label>
+                  <input type="radio" name="commNSFW" value="no" id="nsfw-no">
+                  <label for="nsfw-no" class="mr-3">Nope.</label>
+                </div>
+                <% } %>
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn" data-dismiss="modal">Nevermind</button>
+            <button type="button" class="btn btn-success ml-auto" id="new-comm-button" disabled>Add Commission</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal fade" id="edit-comm-modal" tabindex="-1" role="dialog" aria-labelledby="edit-comm-modal-label" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="edit-comm-modal-label"><span class="edit-comm-name">Let's Set Something Up</span></h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true"><i class="far fa-times"></i></span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <div class="spinner inactive" id="edit-comm-spinner">
+              <div class="double-bounce1"></div>
+              <div class="double-bounce2"></div>
+            </div>
+            <form id="edit-comm-form">
+              <div class="upload" id="edit-comm-example-upload" data-multiple="false">
+                <i class="far fa-cloud-upload-alt fa-5x"></i>
+                <p>Drag your example image here or click the button to upload.</p>
+                <div id="edit-preview-images"></div>
+                <label for="edit-comm-example-input" id="edit-comm-example-label" class="btn btn-simple btn-sm">Upload</label>
+                <input type="file" id="edit-comm-example-input" name="images" class="d-none ref-input" accept="image/*">
+              </div>
+              <div class="form-group full">
+                <label for="edit-comm-name">Commission Name<span class="text-danger ml-1">*</span></label>
+                <input type="text" id="edit-comm-name" class="form-control" required>
+              </div>
+              <div class="form-group">
+                <label for="edit-comm-price">Price in USD<span class="text-danger ml-1">*</span><span class="ml-3"><small><a href="https://xe.com">Check Exchange Rates</a></small></span></label>
+                <div class="input-group">
+                  <input type="number" min="1" class="form-control" id="edit-comm-price">
+                  <div class="input-group-append">
+                    <span class="input-group-text">
+                      <i class="fas fa-dollar-sign fa-fw"></i>
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="edit-comm-available">
+                  Number Available
+                </label>
+                <div class="input-group">
+                  <input type="number" class="form-control" id="edit-comm-available">
+                  <div class="input-group-append">
+                    <span class="input-group-text">
+                      <i class="fas fa-paint-brush fa-fw"></i>
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <div class="form-group full">
+                <label for="edit-comm-description">Commission Description<span class="text-danger ml-1">*</span></label>
+                <textarea class="form-control" id="edit-comm-description" max="150" required placeholder="Tell us about your awesome commission. You've got 150 characters."></textarea>
+              </div>
+              <div class="form-group full">
+                <label for="edit-comm-tags">Tags <small class="ml-3">(Add Tags with #)</small></label>
+                <div class="input-group">
+                  <input type="text" class="form-control" id="edit-comm-tags">
+                  <div class="input-group-append">
+                    <span class="input-group-text">
+                      <i class="fas fa-tags fa-fw"></i>
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="edit-comm-type">Commission Type<span class="text-danger ml-1">*</span></label>
+                <select class="custom-select" id="edit-comm-type">
+                  <option selected disabled value="">Select Type</option>
+                  <!--<option value="animation">Animation</option>-->
+                    <option value="comic">Comic</option>
+                    <option value="craft">Craft</option>
+                    <option value="digital">Digital Art</option>
+                    <option value="graphic_design">Graphic Design</option>
+                    <!--<option value="fiction">Fiction</option>-->
+                    <!--<option value="film">Film</option>-->
+                    <!--<option value="non-fiction">Non-Fiction</option>-->
+                    <option value="photo">Photo</option>
+                    <!--<option value="poetry">Poetry</option>-->
+                    <option value="traditional">Traditional Art</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="edit-comm-nsfw">NSFW?<span class="text-danger ml-1">*</span></label>
+                <% if(NSFW == false){ %>
+                <p>Sorry, you must be over 18 to offer NSFW content.</p>
+                <% } else { %>
+                <div class="radio" id="edit-NSFW">
+                  <input type="radio" name="edit_comm_nsfw" value="yes" id="edit-nsfw-yes">
+                  <label for="edit-nsfw-yes" class="mr-3">Yup.</label>
+                  <input type="radio" name="edit_comm_nsfw" value="no" id="edit-nsfw-no">
+                  <label for="edit-nsfw-no" class="mr-3">Nope.</label>
+                </div>
+                <% } %>
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn" data-dismiss="modal">Nevermind</button>
+            <button type="button" class="btn btn-success ml-auto" id="edit-comm-button">Edit Commission</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="grid-container">
+      <nav>
+        <a href="/" id="home-img"></a>
+        <button type="button" class="dash-link" data-section="notifications">
+          <i class="fal fa-bell fa-2x fa-fw"></i>
+          <span class="dash-link-label">Notifications
+            <% if(user.notifications.length > 0){ %>
+            <span id="new-notes"><%=user.notifications.length%></span>
+            <% } %>
+          </span>
+        </button>
+        <button type="button" class="dash-link active" data-section="home">
+          <i class="fal fa-home fa-2x fa-fw"></i>
+          <span class="dash-link-label">Home</span>
+        </button>
+        <button type="button" class="dash-link" data-section="commissions">
+          <i class="fal fa-paint-brush fa-2x fa-fw"></i>
+          <span class="dash-link-label">Commissions</span>
+        </button>
+        <button type="button" class="dash-link" data-section="transactions">
+          <i class="fal fa-handshake-alt fa-2x fa-fw"></i>
+          <span class="dash-link-label">Transactions</span>
+        </button>
+        <button type="button" class="dash-link" data-section="financials">
+          <i class="fal fa-piggy-bank fa-2x fa-fw"></i>
+          <span class="dash-link-label">Financials</span>
+        </button>
+        <!--<button type="button" class="dash-link" data-section="analytics">-->
+        <!--  <i class="fal fa-analytics fa-2x fa-fw"></i>-->
+        <!--</button>-->
+        <!--<p class="dash-link-label"><span>Analytics</span></p>-->
+        <button type="button" class="dash-link" data-section="social">
+          <i class="fal fa-users fa-2x fa-fw"></i>
+          <span class="dash-link-label">Social</span>
+        </button>
+        <button type="button" class="dash-link" data-section="settings">
+          <i class="fal fa-cog fa-2x fa-fw"></i>
+          <span class="dash-link-label">Settings</span>
+        </button>
+        <button type="button" class="dash-link" id="signout">
+          <i class="fal fa-sign-out-alt fa-2x fa-fw"></i>
+          <span class="dash-link-label">Logout</span>
+        </button>
+      </nav>
+      <main>
+        <hgroup>
+          <h1 id="section-title">Home</h1>
+          <h2 id="today-date"><%=datify(Date.now(), 'US')%></h2>
+          <h2 id="profile-link">
+            <a href="/<%=user.username%>">
+              <div class="rounded-circle profile-img ml-auto text-right" style="background-image:url('<%=user.profile.url%>')"></div>
+              <span id="username"><%=user.username%></span>
+            </a>
+          </h2>
+        </hgroup>
+        <div class="inactive" id="alert-box"></div>
+        <% include ./notifications %>
+        <% include ./home %>
+        <% include ./commissions %>
+        <% include ./transactions %>
+        <% include ./financials %>
+        <% include ./social %>
+        <% include ./settings %>
+      </main>
+      <section id="new-notification-zone"></section>
+      <section id="quick-tools">
+        <% if(user.preferences.night == false){ %>
+        <button type="button" class="tool-button night-shift" id="night-shift" title="Night Mode" data-toggle="tooltip" data-placement="right"><i class="far fa-moon fa-2x fa-fw"></i></button>
+        <% } else { %>
+        <button type="button" class="tool-button night-shift" id="day-shift" title="Day Mode" data-toggle="tooltip" data-placement="right"><i class="far fa-sun fa-2x fa-fw"></i></button>
+        <% } %>
+        <% if(NSFW == true){ %>
+          <% if(user.nsfw_filter == false){ %>
+        <button type="button" class="tool-button" id="nsfw-show" title="Hide NSFW Content" data-toggle="tooltip" data-placement="right"><i class="far fa-eye-slash fa-2x fa-fw" id="nsfw-icon"></i></button>
+        <% } else if(user.nsfw_filter == true){ %>
+        <button type="button" class="tool-button" id="nsfw-show" title="Show NSFW Content" data-toggle="tooltip" data-placement="right"><i class="far fa-eye fa-2x fa-fw" id="nsfw-icon"></i></button>
+          <% } %>
+        <% } %>
+        <% if(user.isArtist == true){ %>
+          <% if(user.open == true){ %>
+        <button type="button" class="tool-button new-comm" id="new-comm" title="Add New Commission" data-toggle="tooltip" data-placement="right"><i class="far fa-plus fa-2x fa-fw"></i></button>
+        <button type="button" class="tool-button comm-status" id="close-comms" title="Close Commissions" data-toggle="tooltip" data-placement="right"><i class="far fa-times fa-2x fa-fw"></i></button>
+        <% } else { %>
+        <button type="button" class="tool-button comm-status" id="open-comms" title="Open Commissions" data-toggle="tooltip" data-placement="right"><i class="far fa-check-circle fa-2x fa-fw"></i></button>
+          <% } %>
+        <% } else { %>
+          <% if(user.canArt == true){ %>
+        <button type="button" class="tool-button" id="become-artist" data-toggle="tooltip" data-placement="right" title="Become an Artist"><i class="far fa-pencil-paintbrush fa-2x fa-fw"></i></button>
+          <% } %>
+        <% } %>
+      </section>
+    </div>
+  </body>
+  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.3.5/cropper.min.js"></script>
+  <script src="/js/main.js" type="text/javascript"></script>
+  <script src="/js/dash/main.js" type="text/javascript"></script>
+  <script src="/js/dash/home.js" type="text/javascript"></script>
+  <script src="/js/dash/commission.js" type="text/javascript"></script>
+  <script src="/js/dash/notifications.js" type="text/javascript"></script>
+  <script src="/js/dash/transactions.js" type="text/javascript"></script>
+  <script src="/js/dash/financials.js" type="text/javascript"></script>
+  <script src="/js/dash/settings.js" type="text/javascript"></script>
+  <!--<script src="/js/dash/analytics.js" type="text/javascript"></script>-->
+</html>

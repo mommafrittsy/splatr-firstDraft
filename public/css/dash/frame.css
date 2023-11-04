@@ -1,0 +1,356 @@
+.block {
+  align-self: start;
+  background-color: #fff;
+  border-radius: .25rem;
+  box-shadow: 5px 5px 6px rgba(0,0,0,.16);
+  opacity: .85;
+  padding: 30px;
+}
+.block-name {
+  border-bottom: 2px solid;
+  font-size: 14pt;
+  padding-bottom: 15px;
+}
+.block-name > svg {
+  margin-right: 15px;
+}
+#comm-example-upload, #edit-comm-example-upload {
+  grid-column: 1/3;
+  grid-row: 1;
+  margin: 15px 0;
+}
+#comm-form, #edit-comm-form {
+  display: grid;
+  grid-column-gap: 15px;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: minmax(300px, min-content) repeat(6, auto);
+}
+#comm-spinner, #edit-comm-spinner {
+  grid-column: 1/3;
+  grid-row: 1/9;
+}
+.fade-out {
+  opacity: 0;
+  transition: opacity 400ms linear;
+}
+input[type="number"] {
+  -webkit-appearance: textfield;
+  -moz-appearance: textfield;
+}
+textarea.form-control, textarea.form-control:focus {
+  border-bottom-width: 3px;
+  border-radius: .25rem;
+}
+.form-group.full {
+  grid-column: 1/3;
+}
+#grid-container {
+  display: grid;
+  grid-row-gap: 15px;
+  grid-template-columns: minmax(100px, min-content) 1fr 300px;
+  grid-template-rows: 100px 1fr 80px;
+  height: 100vh;
+  width: 100vw;
+}
+hgroup{
+  align-items: center;
+  color: #fff;
+  display: grid;
+  font-weight: 400;
+  grid-column: 1;
+  grid-row: 1;
+  grid-template-columns:1fr;
+  grid-template-rows: repeat(3, 1fr);
+  margin: 0;
+  text-align: center;
+}
+hgroup > h1 {
+  font-size: 16pt;
+  grid-column:1;
+  grid-row: 1;
+}
+hgroup > h2 {
+  font-size: 14pt;
+  grid-column: 1;
+  grid-row: 2;
+}
+hgroup > #profile-link {
+  grid-column: 1;
+  grid-row: 3;
+}
+hgroup > #profile-link > a {
+  color:#fff;
+  cursor: pointer;
+}
+.inactive {
+  display: none !important;
+}
+main {
+  background-attachment: fixed;
+  background-image: linear-gradient(to bottom, rgba(0,0,0,.4), rgba(67,67,67,.4)), 
+                    url("https://ayizan.blob.core.windows.net/site-images/Backpacker w- camera.jpeg");
+  background-position: 50% 50%;
+  background-repeat: no-repeat;
+  background-size: cover;
+  display: grid;
+  grid-column: 2/5;
+  grid-row: 1/4;
+  grid-template-columns: 1fr;
+  grid-template-rows: minmax(50px,min-content) auto 1fr;
+  padding: 25px;
+}
+main > section {
+  grid-column: 1;
+  grid-row: 3;
+  justify-content: space-around;
+  overflow-y: auto;
+}
+nav {
+  background: #fff;
+  background: linear-gradient(to bottom, #ffffff 0%,#f3f3f3 85%);
+  box-shadow: 5px 5px 6px rgba(0,0,0,.16);
+  display: grid;
+  grid-column: 1;
+  grid-row: 1/4;
+  grid-row-gap: 15px;
+  grid-template-rows: 100px repeat(9, 1fr) 15px;
+  justify-content: center;
+  padding: 15px 0;
+  transition: 400ms all ease-in-out;
+}
+nav > .dash-link {
+  align-items: center;
+  background: transparent;
+  border: none;
+  color: #46e2b0;
+  cursor: pointer;
+  display: grid;
+  grid-column: 1;
+  grid-template-columns: 100px min-content;
+  justify-content: center;
+}
+nav > .dash-link:hover , nav > .dash-link.active{
+  background-color: rgba(69,1,118,.8);
+  color: #fff;
+}
+nav > .dash-link > svg {
+  margin: auto;
+}
+nav .dash-link-label {
+  font-size: 14pt;
+  grid-column: 2;
+  overflow-x: hidden;
+  transition: width 400ms ease-in-out;
+  width: 0;
+}
+nav > .dash-link:hover > .dash-link-label, nav > .dash-link.active > .dash-link-label {
+  color: #fff;
+}
+nav > #home-img {
+  background-image: url('https://ayizan.blob.core.windows.net/ayizanlogos/Logos/Splatr Stacked.svg');
+  background-position: 50% 50%;
+  background-repeat: no-repeat;
+  background-size: contain;
+  grid-column: 1;
+  grid-row: 1;
+  margin: 0 15px;
+}
+#new-notes {
+  background-color: #46e2b0;
+  border-radius: 50%;
+  color: white;
+  font-size: 10pt;
+  padding: 3px 7px;
+  margin-left: 15px;
+}
+.notification {
+  align-items: center; 
+  background: #fff;
+  border-top: 4px solid;
+  border-radius: .25rem;
+  box-shadow: 5px 5px 6px rgba(0,0,0,.16);
+  display: grid;
+  grid-column-gap: 15px;
+  grid-template-columns: 1fr 3fr;
+  grid-template-rows: 1fr;
+  height: 100px;
+  justify-content: center;
+  margin: 15px;
+  text-align: center;
+}
+.notification.art {
+  border-color: #7402c6;
+  color: #7402c6;
+}
+.notification.comment {
+  border-color: #46e2b0;
+  color: #46e2b0;
+}
+.notification.like {
+  border-color: #f46767;
+  color: #f46767;
+}
+.notification.money {
+  border-color: #55b55d;
+  color: #55b55d;
+}
+.notification p {
+  font-size: 10pt;
+  grid-column: 2;
+  grid-row: 1;
+  margin: 0;
+  padding: 0 10px;
+}
+.notification svg {
+  margin: auto;
+  grid-column: 1;
+  grid-row: 1;
+}
+#new-notification-zone {
+  align-self: end;
+  display: none;
+  flex-direction: column;
+  justify-content: end;
+  grid-column: 4;
+  grid-row: 2;
+}
+#quick-tools {
+  display: grid;
+  grid-column: 2/5;
+  grid-row: 3;
+  grid-template-columns: 1fr repeat(4, 80px) 30px;
+  grid-template-rows: 1fr;
+  z-index: 1000;
+}
+#section-title {
+  margin-bottom: 0;
+}
+table {
+  text-align: center;
+  overflow-x: auto;
+}
+.tool-button {
+  background-color: #606060;
+  border: none;
+  border-radius: 100px;
+  box-shadow: 5px 5px 6px rgba(0,0,0,.16);
+  cursor: pointer;
+  color: white;
+  grid-row: 1;
+  margin: 15px;
+}
+.tool-button#become-artist {
+  background-color:#3f314f;
+  grid-column: 4;
+}
+.tool-button#close-comms {
+  background-color: #f46464;
+  grid-column: 5;
+}
+.tool-button#day-shift {
+  /*background-color: #fff6ce;*/
+  background-color: #f2de83;
+  grid-column: 2;
+}
+.tool-button#new-comm {
+  background-color: #6b3890;
+  grid-column: 4;
+}
+.tool-button#night-shift {
+  background-color: #252525;
+  grid-column: 2;
+}
+.tool-button#nsfw-show {
+  background-color: #46e2b0;
+  grid-column: 3;
+}
+.tool-button#open-comms {
+  background-color: #46e2b0;
+  grid-column: 4;
+}
+@media (min-width: 800px){
+  #grid-container {
+    grid-template-columns: minmax(100px, min-content) 80px 1fr 300px;
+    grid-template-rows: 100px 1fr;
+  }
+  hgroup {
+    grid-template-columns:1fr 2fr 1fr;
+    grid-template-rows: 1fr;
+  }
+  hgroup > h1 {
+    grid-column: 1;
+    grid-row: 1;
+    text-align: left;
+  }
+  hgroup > h2 {
+    grid-column: 2;
+    grid-row: 1;
+  }
+  hgroup > #profile-link {
+    grid-column: 3;
+    grid-row: 1;
+    text-align: right;
+  }
+  nav:hover .dash-link-label {
+    width: 150px;
+  }
+  nav:hover > #home-img {
+    background-image: url('https://ayizan.blob.core.windows.net/ayizanlogos/Logos/Splatr Purple.svg');
+    grid-column: 1/3;
+    margin: 15px 0;
+    width: 100%;
+  }
+  #new-notification-zone {
+    display: flex;
+  }
+  #quick-tools {
+    grid-column: 2;
+    grid-row: 2;
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr repeat(4, 80px) 30px;
+    opacity: 0;
+    transition: opacity 400ms ease-in-out;
+  }
+  #quick-tools:hover {
+    opacity: 1;
+  }
+  .tool-button {
+    grid-column: 1;
+  }
+  .tool-button#become-artist {
+    grid-column:1;
+    grid-row: 4;
+  }
+  .tool-button#close-comms {
+    grid-column: 1;
+    grid-row: 5;
+  }
+  .tool-button#day-shift {
+    grid-column: 1;
+    grid-row: 2;
+  }
+  .tool-button#new-comm {
+    grid-column: 1;
+    grid-row: 4;
+  }
+  .tool-button#night-shift {
+    grid-column: 1;
+    grid-row: 2;
+  }
+  .tool-button#nsfw-show {
+    grid-column: 1;
+    grid-row: 3;
+  }
+  .tool-button#open-comms{
+    grid-column: 1;
+    grid-row: 4;
+  }
+}
+@keyframes fadeTools {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}

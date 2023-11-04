@@ -1,0 +1,48 @@
+{
+  "name": "splatr",
+  "version": "0.0.1",
+  "description": "Creating a way for artists to take commissions in an intuitive and simple way.",
+  "engines": {
+    "node": ">=8.12.0",
+    "npm": ">=6.0.0"
+  },
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "Art",
+    "Artists",
+    "Commissions",
+    "Streamline"
+  ],
+  "author": "N. Fritts",
+  "dependencies": {
+    "algoliasearch": "^3.30.0",
+    "azure-storage": "^2.10.1",
+    "body-parser": "^1.18.3",
+    "connect-flash": "^0.1.1",
+    "connect-mongodb-session": "^2.1.1",
+    "cropperjs": "^1.4.1",
+    "crypto-random-string": "^1.0.0",
+    "dotenv": "^6.2.0",
+    "ejs": "^2.6.1",
+    "express": "^4.16.3",
+    "express-session": "^1.15.6",
+    "helmet": "^3.13.0",
+    "jimp": "^0.6.0",
+    "mongoose": "^5.2.9",
+    "multer": "^1.3.1",
+    "node-mailjet": "^3.2.1",
+    "passport": "^0.4.0",
+    "passport-facebook": "^2.1.1",
+    "passport-google-oauth20": "^1.0.0",
+    "passport-local": "^1.0.0",
+    "passport-local-mongoose": "^5.0.1",
+    "passport-twitter": "^1.0.4",
+    "streamifier": "^0.1.1",
+    "stripe": "^6.7.0",
+    "unsplash-js": "^4.8.0"
+  }
+}

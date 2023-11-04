@@ -1,0 +1,195 @@
+<% include partials/header %>
+  <div id="faqs">
+    <h1>Welcome to our FAQs</h1>
+    <p>We've got all kinds of answers here, hopefully at least one of them answers your question. If not, get in touch!</p>
+    <h1 class="h3">How we do what we do. <small>(Process <span class="text-success">&</span> Features)</small></h1>
+    <div class="row justify-content-center">
+      <div class="col-12 col-md-10 col-xl-8">
+        <div id="accordion" role="tablist" aria-multiselectable="true" class="card-collapse">
+          <div class="card card-plain">
+            <div class="card-header" role="tab" id="headingEight">
+              <a class="collapsed" data-toggle="collapse" data-parent="#accordion" href="#questionEight" aria-expanded="false" aria-controls="questionEight">
+                  Why Splatr?
+                  <i class="now-ui-icons arrows-1_minimal-down"></i>
+              </a>
+            </div>
+            <div id="questionEight" class="collapse" role="tabpanel" aria-labelledby="headingEight">
+              <div class="card-body">
+                <p>You might already be an artist who is 100% organized and able to keep track of your daily life, payments coming in and going out, and still find the time to work on the healthy and consistent stream of commission requests you’ve been receiving. For you, we’re here to make it even easier and more convenient.</p>
+                <p>Or maybe you’re a commissioner who already has an artist in mind for your next request (and a way to contact them!) and you know when they’ll be available again (if they aren’t already). Maybe you already have several requests out there and you’re just waiting (patiently) for each piece of artwork to make its way back to you. For you, we’re here to help you keep track and remove the guesswork.</p>
+                <p>If neither situation rings true, we want to change that. We just want to help, and make sure both artists and commissioners can find each other and resolve any issues that may come up in the process — as they tend to.</p>
+              </div>
+            </div>
+          </div>
+          <!--<div class="card card-plain">-->
+          <!--  <div class="card-header" role="tab" id="headingNine">-->
+          <!--    <a class="collapsed" data-toggle="collapse" data-parent="#accordion" href="#questionNine" aria-expanded="false" aria-controls="questionNine">-->
+          <!--        How do you find artists?-->
+          <!--        <i class="now-ui-icons arrows-1_minimal-down"></i>-->
+          <!--    </a>-->
+          <!--  </div>-->
+          <!--  <div id="questionNine" class="collapse" role="tabpanel" aria-labelledby="headingNine">-->
+          <!--    <div class="card-body">-->
+          <!--      <p>Finding new artists is a breeze. With our search feature, you can find artists by style, availability, pricing, etc. Just click "Find" up top!</p>-->
+          <!--    </div>-->
+          <!--  </div>-->
+          <!--</div>-->
+          <div class="card card-plain">
+            <div class="card-header" role="tab" id="headingOneA">
+              <a class="collapsed" data-toggle="collapse" data-parent="#accordion" href="#questionOneA" aria-expanded="false" aria-controls="questionOneA">
+                  I'm living in a country Splatr supports, but I'm a citizen of a country it doesn't. Can I use Splatr? 
+                <i class="now-ui-icons arrows-1_minimal-down"></i>
+              </a>
+            </div>
+            <div id="questionOneA" class="collapse" role="tabpanel" aria-labelledby="headingOneA">
+              <div class="card-body">
+                <p>Most likely, yes. Our country restrictions are based on where you currently live and where you have a bank account. If both of those things are in a country that we support, you're good to go for Splatr!</p>
+              </div>
+            </div>
+          </div>
+          <div class="card card-plain">
+            <div class="card-header" role="tab" id="headingTwoA">
+              <a class="collapsed" data-toggle="collapse" data-parent="#accordion" href="#questionTwoA" aria-expanded="false" aria-controls="questionTwoA">
+                  Why do you only support certain countries?
+                <i class="now-ui-icons arrows-1_minimal-down"></i>
+              </a>
+            </div>
+            <div id="questionTwoA" class="collapse" role="tabpanel" aria-labelledby="headingTwoA">
+              <div class="card-body">
+                <p>Splatr uses Stripe to process payments and make sure that artists get paid. Due to this, we can only support the countries that Stripe will allow accounts for. You can view the <a href="https://stripe.com/global">current list here</a>. As Stripe adds support for other countries, we will add that support to Splatr.</p>
+              </div>
+            </div>
+          </div>
+          <div class="card card-plain">
+            <div class="card-header" role="tab" id="headingTen">
+              <a class="collapsed" data-toggle="collapse" data-parent="#accordion" href="#questionTen" aria-expanded="false" aria-controls="questionTen">
+                  How do I manage my commissions? 
+                <i class="now-ui-icons arrows-1_minimal-down"></i>
+              </a>
+            </div>
+            <div id="questionTen" class="collapse" role="tabpanel" aria-labelledby="headingTen">
+              <div class="card-body">
+                <p>From <% if(currentUser){%><a href="/dash"><% } %>your Dash<% if(currentUser){ %></a><% } %>, you can click on any of the transaction links to take you to the dedicated transaction page. From there you can upload process images, make payments, leave reviews and download final pieces.</p>
+              </div>
+            </div>
+          </div>
+          <div class="card card-plain">
+            <div class="card-header" role="tab" id="headingEleven">
+              <a class="collapsed" data-toggle="collapse" data-parent="#accordion" href="#questionEleven" aria-expanded="false" aria-controls="questionEleven">
+                  What file types do you accept?
+                <i class="now-ui-icons arrows-1_minimal-down"></i>
+              </a>
+            </div>
+            <div id="questionEleven" class="collapse" role="tabpanel" aria-labelledby="headingEleven">
+              <div class="card-body">
+                <p>Right now, we only accept image files. In the future (very near future, we hope), you'll be able to upload audio, text, and video files!</p>
+              </div>
+            </div>
+          </div>
+          <div class="card card-plain">
+            <div class="card-header" role="tab" id="headingTwelve">
+              <a class="collapsed" data-toggle="collapse" data-parent="#accordion" href="#questionTwelve" aria-expanded="false" aria-controls="questionFour">
+                  How large a file can I upload? 
+                <i class="now-ui-icons arrows-1_minimal-down"></i>
+              </a>
+            </div>
+            <div id="questionTwelve" class="collapse" role="tabpanel" aria-labelledby="headingTwelve">
+              <div class="card-body">
+                <p>Please keep your uploads under 5MB each. You can upload multiple images, but each one needs to be under 5MB unless we mention otherwise.</p>
+              </div>
+            </div>
+          </div>
+          <div class="card card-plain">
+            <div class="card-header" role="tab" id="headingSeven">
+              <a data-toggle="collapse" data-parent="#accordion" href="#questionSeven" aria-expanded="false" aria-controls="questionSeven" class="collapsed">
+                  I'm having a problem with my commission process&mdash;I can't seem to reach my commissioner! How will Splatr help me mediate this situation?
+                <i class="now-ui-icons arrows-1_minimal-down"></i>
+              </a>
+            </div>
+            <div id="questionSeven" class="collapse" role="tabpanel" aria-labelledby="headingSeven" style="">
+              <div class="card-body">
+                <p>That’s the pits. If you’re having trouble with your commission for any reason, let us know (<a href="mailto:team@splatr.art">team@splatr.art</a>). We’ll step in and help resolve the issue so that you can focus on other things.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <h1 class="h3">Don't Sell Yourself Short! <small>(Financials <span class="text-success">&</span> Such)</small></h1>
+    <div class="row justify-content-center">
+      <div class="col-12 col-md-10 col-xl-8">
+        <div id="accordion" role="tablist" aria-multiselectable="true" class="card-collapse">
+          <div class="card card-plain">
+            <div class="card-header" role="tab" id="headingOne">
+              <a data-toggle="collapse" data-parent="#accordion" href="#questionOne" aria-expanded="false" aria-controls="questionOne" class="collapsed">
+                How does pricing work? As an artist, will Splatr help me determine what a fair price for my work is?
+                <i class="now-ui-icons arrows-1_minimal-down"></i>
+              </a>
+            </div>
+            <div id="questionOne" class="collapse" role="tabpanel" aria-labelledby="headingOne" style="">
+                <div class="card-body">
+                    <p>
+                      There is no one pricing method or scale that we can recommend for you. At the end of the day, the time taken to complete each commission, the details included, and skill required/accumulated over time must factor into the price. This means different things to each artist and may change over time.
+                    </p>
+                </div>
+            </div>
+          </div>
+          <div class="card card-plain">
+            <div class="card-header" role="tab" id="headingTwo">
+              <a class="collapsed" data-toggle="collapse" data-parent="#accordion" href="#questionTwo" aria-expanded="false" aria-controls="questionTwo">
+                Why does Splatr require a deposit?
+                <i class="now-ui-icons arrows-1_minimal-down"></i>
+            </a>
+            </div>
+            <div id="questionTwo" class="collapse" role="tabpanel" aria-labelledby="headingTwo">
+                <div class="card-body">
+                  <p>The primary goal of deposits are to foster a sense of mutual security. Once you submit your commission request, the deposit you pay will signal the artist that you are equally committed to a commission.</p>
+                </div>
+              </div>
+          </div>
+          <div class="card card-plain">
+            <div class="card-header" role="tab" id="headingThree">
+              <a class="collapsed" data-toggle="collapse" data-parent="#accordion" href="#questionThree" aria-expanded="false" aria-controls="questionThree">
+                  What happens if I'm not completely satisfied with the finished product or my artist can't complete the piece in time?
+                  <i class="now-ui-icons arrows-1_minimal-down"></i>
+              </a>
+            </div>
+            <div id="questionThree" class="collapse" role="tabpanel" aria-labelledby="headingThree">
+              <div class="card-body">
+                <p>Let us know as soon as possible! Once the artist you’ve commissioned is far enough along in their progress, they’ll send you a preview of the commission. If you’re not satisfied at that time, leave them a note detailing your concerns and/or the changes you’d like to see.
+                <p>If the artist isn’t able to complete their end of the transaction, or does not meet a mutual, pre-agreed upon deadline, contact us at <a href="mailto:team@splatr.art">team@splatr.art</a> to start mediations. In certain cases, you may be able to recover your deposit.</p>  
+                <!--<p>Additional charges may apply if your changes to the preview go beyond the original commission request; these charges are to be applied at the artist’s discretion.</p>-->
+              </div>
+            </div>
+          </div>
+          <div class="card card-plain">
+            <div class="card-header" role="tab" id="headingFour">
+              <a class="collapsed" data-toggle="collapse" data-parent="#accordion" href="#questionFour" aria-expanded="false" aria-controls="questionFour">
+                  What forms of payment will be accepted?
+                  <i class="now-ui-icons arrows-1_minimal-down"></i>
+              </a>
+            </div>
+            <div id="questionFour" class="collapse" role="tabpanel" aria-labelledby="headingFour">
+              <div class="card-body">
+                <p>We accept all major credit cards! We're working on accepting digital wallets, so keep your eyes out for that.</p>
+              </div>
+            </div>
+          </div>
+          <div class="card card-plain">
+              <div class="card-header" role="tab" id="headingFive">
+                <a class="collapsed" data-toggle="collapse" data-parent="#accordion" href="#questionFive" aria-expanded="false" aria-controls="questionFive">
+                    What are the costs to be to use Splatr's services?
+                    <i class="now-ui-icons arrows-1_minimal-down"></i>
+                </a>
+              </div>
+              <div id="questionFive" class="collapse" role="tabpanel" aria-labelledby="headingFive">
+                <div class="card-body">
+                  <p>There will be an 12% processing fee on all transactions. This covers credit card and transfer processing fees of around 4-6%. The rest goes to Splatr to keep making art easier.</p>
+                </div>
+              </div>
+            </div>
+        </div>
+        </div>
+    </div>
+  </div>
+<% include partials/footer %>

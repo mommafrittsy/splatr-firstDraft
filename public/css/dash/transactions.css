@@ -1,0 +1,32 @@
+.date-range {
+  grid-row: 4;
+}
+#search-inputs {
+  display: grid;
+  grid-column-gap: 15px;
+  /*grid-row-gap: 15px;*/
+  grid-template-columns: 1fr;
+  margin: 15px;
+}
+#transactions {
+  display: grid;
+  grid-template-columns: minmax(25px, 100px) minmax(300px, 1fr) minmax(25px, 100px);
+  grid-template-rows: 1fr;
+}
+#trans-search {
+  grid-column: 2;
+  grid-row: 1;
+  margin: 15px;
+}
+@media (min-width: 1000px){
+  #search-inputs > .input-group {
+    grid-row: 2;
+  }
+  label {
+    grid-row: 1;
+  }
+  #search-inputs{
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: repeat(2, auto);
+  }
+}

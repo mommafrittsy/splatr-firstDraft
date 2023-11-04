@@ -1,0 +1,77 @@
+<section id="analytics">
+  <article class="block">
+    <h2 class="block-name"><i class="fal fa-analytics fa-lg fa-fw mr-3"></i>Analytics</h2>
+    <div id="charts">
+      <div class="chart">
+        <h3 class="chart-name"><i class="fal fa-user-chart fa-lg fa-fw mr-3"></i>You and Your Commissions</h3>
+        <select class="custom-select">
+          <option selected disabled>Event Type</option>
+          <option value="accepted">Accepted</option>
+          <option value="declined">Declined</option>
+          <option value="new-fans">New Fans</option>
+          <option value="finalized">Finalized</option>
+          <option value="requested">Requested</option>
+        </select>
+        <select class="custom-select">
+          <option disabled selected>Time Frame</option>
+          <option disabled>By Time Passed</option>
+          <option value="1-week">1 Week</option>
+          <option value="4-week">4 Weeks</option>
+          <option value="1-year">1 Year</option>
+          <option disabled>Period to Date</option>
+          <option value="mtd">Month to Date</option>
+          <option value="qtd">Quarter to Date</option>
+          <option value="ytd">Year to Date</option>
+          <option disabled>By Quarter</option>
+          <option value="quarter-1">Quarter 1</option>
+          <option value="quarter-2">Quarter 2</option>
+          <option value="quarter-3">Quarter 3</option>
+          <option value="quarter-4">Quarter 4</option>
+        </select>
+        <canvas></canvas>
+      </div>
+      <div class="chart">
+        <h3 class="chart-name"><i class="fal fa-hand-holding-usd fa-lg fa-fw mr-3"></i>Your Income</h3>
+        <select class="custom-select">
+          <option selected disabled>Payment Type</option>
+          <option value="deposits">Deposits</option>
+          <option value="finals">Final Payments</option>
+        </select>
+        <select class="custom-select">
+          <option disabled selected>Time Frame</option>
+          <option disabled>By Time Passed</option>
+          <option value="1-week">1 Week</option>
+          <option value="4-week">4 Weeks</option>
+          <option value="1-year">1 Year</option>
+          <option disabled>Period to Date</option>
+          <option value="mtd">Month to Date</option>
+          <option value="qtd">Quarter to Date</option>
+          <option value="ytd">Year to Date</option>
+          <option disabled>By Quarter</option>
+          <option value="quarter-1">Quarter 1</option>
+          <option value="quarter-2">Quarter 2</option>
+          <option value="quarter-3">Quarter 3</option>
+          <option value="quarter-4">Quarter 4</option>
+        </select>
+        <canvas></canvas>
+      </div>
+      <div class="chart">
+        <h3 class="chart-name"><i class="fal fa-pencil-paintbrush fa-lg fa-fw mr-3"></i>Your Artwork</h3>
+        <select class="custom-select">
+          <option selected disabled>Artwork Name</option>
+          <% for(let art of user.gallery){ %>
+            <% if(art.title){ %>
+          <option value="<%=art._id%>"><%=art.title%></option>
+            <% } %>
+          <% } %>
+        </select>
+        <select class="custom-select">
+          <option selected disabled>Event Type</option>
+          <option value="views">Views</option>
+          <option value="likes">Likes</option>
+        </select>
+        <canvas></canvas>
+      </div>
+    </div>
+  </article>
+</section>

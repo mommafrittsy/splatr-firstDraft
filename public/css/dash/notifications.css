@@ -1,0 +1,39 @@
+.delete-note-btn {
+  background: transparent;
+  border: none;
+  color: #f46464;
+  grid-column: 3;
+  grid-row: 1;
+  height: 100%;
+  opacity: 0;
+  padding: 0;
+  width: 0;
+  z-index: 1000;
+}
+#notification-holder .notification {
+  border-color: #f264b6;
+  grid-template-columns: 1fr 3fr auto;
+  padding: 15px;
+  text-align: center;
+  width: 250px;
+}
+#notification-holder .notification:hover {
+  transition: all 400ms ease-in-out;
+  width: 300px;
+}
+#notification-holder .notification:hover .delete-note-btn {
+  opacity: 1;
+  transition: all 400ms ease-in-out;
+  width: 50px;
+}
+#notification-holder .notification > a {
+  color: #f264b6;
+  grid-column: 1/3;
+  grid-row: 1;
+}
+#notification-holder {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: start;
+}

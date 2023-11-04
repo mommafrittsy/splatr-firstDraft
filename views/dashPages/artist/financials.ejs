@@ -1,0 +1,254 @@
+<section class="inactive" id="financials">
+  <div id="small-blocks">
+    <% if(user.isArtist == true){ %>
+    <article class="block" id="account-balance">
+      <h2 class="block-name"><i class="far fa-money-check fa-lg fa-fw"></i>Account Balance</h2>
+      <h3 class="amount">
+        <%if(['AUD','CAD','HKD','NZD','SGD','USD'].includes(currency.toUpperCase())){ %>
+        $
+        <% } else if(currency.toUpperCase() == 'GBP'){ %>
+        &#163;
+        <% } else if(currency.toUpperCase() == 'JPY'){ %>
+        &#165;
+        <% } else { %>
+        &#8364;
+        <% } %>
+        <span id="available-amount">
+          <%if(available > 0){%>
+          <%=`${(available/100).toFixed(2)}`%>
+          <% } else { %>
+          0.00
+          <% } %>
+        </span>
+        <small><%=currency.toUpperCase()%></small>
+      </h3>
+      <% if(reserved_balance){ %>
+      <p><small>We've reserved $<%=(reserved_balance/100).toFixed(2)%> (USD) to cover your open commissions.</small></p>
+      <% } %>
+      <% if(available > 0 && payouts == true){ %>
+      <button type="button" class="btn btn-success btn-sm" data-toggle="collapse" data-target="#collapseNewPayout" aria-expanded="false" aria-controls="collapseNewPayout">Request Payout</button>
+      <section class="collapse" id="collapseNewPayout">
+        <div class="spinner inactive" id="payout-spinner">
+          <div class="double-bounce1"></div>
+          <div class="double-bounce2"></div>
+        </div>
+        <form id="payout-form" autocomplete="off">
+          <div class="form-group">
+            <label for="payout-account">Destination</label>
+            <div class="input-group">
+              <span class="input-group-prepend">
+                <span class="input-group-text">
+                  <i class="far fa-university fa-lg fa-fw"></i>
+                </span>
+              </span>
+              <select class="form-control custom-select" id="payout-account">
+                <% for(let bank of banks){ %>
+                  <% if(bank.default_for_currency == true){ %>
+                <option value="<%=bank.id%>" selected>XXXXXXXX<%=bank.last4%> <small>(Default)</small></option>
+                  <% } else { %>
+                <option value="<%=bank.id%>">XXXXXXXX<%=bank.last4%> </option>
+                  <% } %>
+                <% } %>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="payout-amount">Amount</label>
+            <div class="input-group">
+              <span class="input-group-prepend">
+                <span class="input-group-text">
+                  <i class="far fa-money-bill-wave fa-lg fa-fw"></i>
+                </span>
+              </span>
+              <input type="number" min="1" max="<%=(available/100)%>" required class="form-control" id="payout-amount">
+            </div>
+          </div>
+          <button type="button" class="btn btn-primary btn-sm" id="submit-request" disabled data-form="payout-form" data-spinner="payout-spinner" data-account="<%=user.stripe.id%>">Request</button>
+          <div id="payout-alert" class="inactive error mt-3">
+            Please keep your request below
+            <%if(['AUD','CAD','HKD','NZD','SGD','USD'].includes(currency.toUpperCase())){ %>
+            $
+            <% } else if(currency.toUpperCase() == 'GBP'){ %>
+            &#163;
+            <% } else if(currency.toUpperCase() == 'JPY'){ %>
+            &#165;
+            <% } else { %>
+            &#8364;
+            <% } %>
+            <%=`${(available/100).toFixed(2)}`%>
+          </div>
+        </form>
+        <div class="inactive" id="payout-receipt">
+          <h2>Payout Confirmation</h2>
+          <p class="text-muted"><small>Accepted On: <span id="payout-accepted"></span></small></p>
+          <p>Payout Amount: <span id="paid-amount"></span></p>
+          <p class="text-muted"><small>Payout ID: <span id="payout-id"></span></small></p>
+        </div>
+      </section>
+      <% } %>
+    </article>
+    <% } %>
+    <% if(pending){ %>
+    <article class="block" id="pending-balance">
+      <h2 class="block-name"><i class="far fa-hand-holding-usd fa-lg fa-fw"></i>Pending Balance</h2>
+      <h3 class="amount">
+        <%if(['AUD','CAD','HKD','NZD','SGD','USD'].includes(currency.toUpperCase())){ %>
+        $
+        <% } else if(currency.toUpperCase() == 'GBP'){ %>
+        &#163;
+        <% } else if(currency.toUpperCase() == 'JPY'){ %>
+        &#165;
+        <% } else { %>
+        &#8364;
+        <% } %>
+        <%if(pending > 0){%>
+        <%=`${(pending).toFixed(2)}`%>
+        <% } else { %>
+        0.00
+        <% } %>
+        <small><%=currency.toUpperCase()%></small>
+      </h3>
+    </article>
+    <% } %>
+    <%if(banks){ %>
+    <article class="block" id="external-accounts">
+      <h2 class="block-name"><i class="far fa-university fa-lg fa-fw"></i>External Accounts</h2>
+      <section id="external-accounts">
+        <%if(banks.length > 0){%>
+          <%for(let acct of banks){%>
+           <%if(acct.default_for_currency == true){%>
+           <p class="account default">XXXXXXXX<%=acct.last4%> <small>(Default)</small></p>
+           <% } %>
+          <% } %>
+          <%for(let acct of banks){%>
+          <%if(acct.default_for_currency == false){%>
+          <p class="account" id="external_account-<%=acct.id%>">XXXXXXXX<%=acct.last4%></span><span class="remove-account" data-user="<%=currentUser.stripe.id%>" data-id="<%=acct.id%>" data-url="external_account"><i class="far fa-times text-danger ml-2"></i></span></p>
+          <% } %>
+          <% } %>
+        <% }%>
+      </section>
+      <button type="button" class="btn btn-success btn-sm" data-toggle="collapse" data-target="#collapseNewAccount" aria-expanded="false" aria-controls="collapseNewAccount">Add External Account</button>
+      <section class="collapse" id="collapseNewAccount">
+        <div class="spinner inactive" id="external-account-spinner">
+          <div class="double-bounce1"></div>
+          <div class="double-bounce2"></div>
+        </div>
+        <form id="new-external" data-country="<%=user.address.country.code%>" data-currency="<%=currency%>" autocomplete="off">
+          <label for="account-number">Account Number</label>
+          <input type="text" class="form-control" name="accountNumber" required>
+          <% if (['AU','CA','GB','HK','JP','NZ','SG','US'].includes(currentUser.address.country.code)){ %>
+          <label for="routing-number">
+            <% if(currentUser.address.country.code == 'GB'){ %>
+            Sort Number
+            <% } else { %>
+            Routing Number
+            <% } %>
+          </label>
+          <input type="text" class="form-control" name="routingNumber" required>
+          <% } %>
+          <input type="hidden" name="accountID" value="<%=currentUser.stripe.id%>">
+          <div class="checkbox mt-3">
+            <input id="account-default" type="checkbox">
+            <label for="account-default">
+              Default Account
+            </label>
+          </div>
+          <button type="button" class="btn btn-primary btn-sm new-account-btn" data-form="new-external" data-spinner="external-account-spinner">Add Account</button>
+        </form>
+      </section>
+    </article>
+    <% } %>
+    <% if(cards){ %>
+    <article class="block" id="saved-cards">
+      <h2 class="block-name"><i class="far fa-credit-card-front fa-lg fa-fw"></i>Saved Cards</h2>
+      <section id="saved-cards">
+        <% for(let card of cards){ %>
+        <p id="card-<%=card.id%>">
+          <%if(card.brand == 'American Express'){%>
+          <i class="fab fa-cc-amex fa-lg fa-fw mr-5"></i>
+          <% } else if(card.brand == 'Diners Club'){ %>
+          <i class="fab fa-cc-diners-club fa-lg fa-fw mr-5"></i>
+          <% }  else { %>
+          <i class="fab fa-cc-<%=card.brand.toLowerCase()%> fa-lg fa-fw mr-3"></i>
+          <% } %>
+          ****<%=card.last4%>
+          <button type="button" class="remove-account" data-user="<%=currentUser.stripe.customerID%>" data-id="<%=card.id%>" data-url="card"><i class="far fa-times text-danger ml-2"></i></button>
+          </p>
+        <% } %>
+      </section>
+    </article>
+    <% } %>
+  </div>
+  <% if(user.completed.length > 0 && payouts == true){ %>
+  <article class="block card" id="payouts">
+    <h2 class="block-name"><i class="far fa-envelope-open-dollar fa-lg fa-fw"></i>Payouts</h2>
+    <div id="payout-filters">
+      <p class="text-center mb-0 mt-3">Search by Date Range</p>
+      <div class="form-row">
+        <div class="form-group col-xl-6 my-3">
+          <label for="payout-start-date" class="sr-only">Start Date</label>
+          <div class="input-group">
+            <span class="input-group-prepend">
+              <span class="input-group-text">
+                <i class="far fa-fw fa-calendar-alt"></i>
+              </span>
+            </span>
+            <input type="date" class="form-control payout-search" id="payout-start-date">
+          </div>
+        </div>
+        <div class="form-group col-xl-6 my-3">
+          <label for="payout-end-date" class="sr-only">End Date</label>
+          <div class="input-group">
+            <span class="input-group-prepend">
+              <span class="input-group-text">
+                <i class="far fa-fw fa-calendar-alt"></i>
+              </span>
+            </span>
+            <input type="date" class="form-control payout-search" id="payout-end-date">
+          </div>
+        </div>
+      </div>
+      <p class="text-center mb-0">Search by Amount Range</p>
+      <div class="form-row">
+        <div class="form-group col-xl-6 my-3">
+          <label for="payout-start-amount" class="sr-only">Start Amount</label>
+          <div class="input-group">
+            <span class="input-group-prepend">
+              <span class="input-group-text">
+                <i class="far fa-fw fa-dollar-sign"></i>
+              </span>
+            </span>
+            <input type="number" min="0" placeholder="Min" class="form-control payout-search" id="payout-start-amount">
+          </div>
+        </div>
+        <div class="form-group col-xl-6 my-3">
+          <label for="payout-end-amount" class="sr-only">End Amount</label>
+          <div class="input-group">
+            <span class="input-group-prepend">
+              <span class="input-group-text">
+                <i class="far fa-fw fa-dollar-sign"></i>
+              </span>
+            </span>
+            <input type="number" min="0" placeholder="Max"  class="form-control payout-search" id="payout-end-amount">
+          </div>
+        </div>
+      </div>
+    </div>
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>
+            Date
+          </th>
+          <th>
+            Amount
+          </th>
+        </tr>
+      </thead>
+      <tbody class="text-center" id="payout-data">
+      </tbody>
+    </table>
+  </article>
+  <% } %>
+</section>

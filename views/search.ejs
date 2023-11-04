@@ -1,0 +1,80 @@
+<% include partials/header %>
+<input type='hidden' value="<%=query%>" id="query">
+<input type="hidden" value="<%=NSFW%>" id="NSFW">
+<main>
+  <section id="filters">
+    <h1 class="filter-header">
+      Search By Artist
+    </h1>
+    <button type="button" class="filter-button" data-type="rating" data-filter="reviews < 10">
+      New <strong>&</strong> Excited
+    </button>
+    <button type="button" class="filter-button" data-type="rating" data-filter="rating > 85">
+      Up <strong>&</strong> Coming
+    </button>
+    <button type="button" class="filter-button" data-type="rating" data-filter="reviews > 50">
+      Loved <strong>&</strong> Practiced
+    </button>
+    <h1 class="filter-header">
+      Search by Price
+    </h1>
+    <button type="button" class="filter-button" data-type="price" data-filter="price < 25">
+      <i class="fas fa-dollar-sign"></i>
+      (< $25)
+    </button>
+    <button type="button" class="filter-button" data-type="price" data-filter="price: 25 TO 100">
+      <i class="fas fa-dollar-sign"></i>
+      <i class="fas fa-dollar-sign"></i>
+      ($25 - $100)
+    </button>
+    <button type="button" class="filter-button" data-type="price" data-filter="price > 100">
+      <i class="fas fa-dollar-sign"></i>
+      <i class="fas fa-dollar-sign"></i>
+      <i class="fas fa-dollar-sign"></i>
+      (> $100)
+    </button>
+    <h1 class="filter-header">Search by Type</h1>
+    <button type="button" class="filter-button" data-type="type" data-filter="type:animation">
+      Animation
+    </button>
+    <button type="button" class="filter-button" data-type="type" data-filter="type:comic">
+      Comic
+    </button>
+    <button type="button" class="filter-button" data-type="type" data-filter="type:craft">
+      Crafts
+    </button>
+    <button type="button" class="filter-button" data-type="type" data-filter="type:digital">
+      Digital Art
+    </button>
+    <button type="button" class="filter-button" data-type="type" data-filter="type:fiction">
+      Fiction
+    </button>
+    <button type="button" class="filter-button" data-type="type" data-filter="type:film">
+      Film
+    </button>
+    <button type="button" class="filter-button" data-type="type" data-filter="type:non-fiction">
+      Non-Fiction
+    </button>
+    <button type="button" class="filter-button" data-type="type" data-filter="type:photo">
+      Photo
+    </button>
+    <button type="button" class="filter-button" data-type="type" data-filter="type:poetry">
+      Poetry
+    </button>
+    <button type="button" class="filter-button" data-type="type" data-filter="type:traditional">
+      Traditional
+    </button>
+  </section>
+  <section id="results">
+    <div class="inactive" id="alert-box"></div>
+    <label for="search" class="sr-only">Search for artists and artwork</label>
+    <div id="search-box">
+      <i class="far fa-search fa-4x" id="big"></i>
+      <i class="far fa-search fa-lg" id="small"></i>
+      <input type="search" id="search">
+    </div>
+    <article id="result-box">
+    </article>
+  </section>
+</main>
+<% include partials/footer %>

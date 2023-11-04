@@ -1,0 +1,93 @@
+#artist-menu,.card, .commission, .fan-link, .modal-content, textarea.form-control, textarea.form-control:focus {
+  background-color: #40334e;
+  color: #fff;
+}
+#artist-menu .menu-button {
+  color: #fff;
+}
+body {
+  background: #1c1721;
+  color: #fff;
+}
+.btn-neutral, .btn-neutral:hover {
+  background: transparent;
+  color: white;
+}
+.card a, .checkbox label::after, .ElementsApp .InputElement.Input {
+  color: #fff !important;
+}
+.custom-select, .form-control {
+  background: transparent;
+  color: white;
+}
+.filter-button {
+  color: #fff;
+}
+footer {
+  background: #1c1721;
+}
+h1, h2, h3, h4, h5, h6, p, a, label, li{
+  color: #fff;
+}
+.meter {
+  background-color: #1c1721;
+}
+#mobile-menu, #nav {
+  background: #1c1721;
+}
+#mobile-menu-button {
+  color: #fff;
+}
+.nav-link {
+  color: #fff;
+}
+.nav-link:hover {
+  color: hsl(275, 70%, 39%);
+}
+.result > .result-text {
+  background: rgba(64, 51, 78, .6);
+}
+.result-text > .comm-type {
+  color: white;
+}
+.result-text > h1 {
+  color: white;
+}
+.result-text > .username {
+  word-break: break-all;
+}
+#search {
+  background: transparent;
+  color: #fff;
+}
+.showcase-title {
+  color: #fff;
+}
+.upload, .upload > .btn {
+  border-color: #fff;
+  color: #fff;
+}
+@media (min-width: 800px){
+  #image {
+    background-image: linear-gradient(60deg, rgba(28, 23, 33, .05), rgba(28, 23, 33, 1) 60%),
+                      url("https://ayizan.blob.core.windows.net/site-images/zoltan-kovacs-272629-unsplash.jpg");
+  }
+  #image-1 {
+    background-image: linear-gradient(60deg, rgba(28, 23, 33, 1) 45%, rgba(28, 23, 33, .05)),
+                      url("https://ayizan.blob.core.windows.net/site-images/Designer at Desk.jpeg");
+  }
+  #map-left {
+    background-image: linear-gradient(100deg, rgba(28, 23, 33, .05), rgba(28, 23, 33, 1) 60%),
+                      url("https://ayizan.blob.core.windows.net/site-images/Melbourne.jpeg");
+  }
+  #map-right {
+    background-image: linear-gradient(100deg, rgba(28, 23, 33, 1) 40%, rgba(28, 23, 33, .05)),
+                      url("https://ayizan.blob.core.windows.net/site-images/Shibuya.jpeg");
+  }
+}
+@media (min-width: 1400px){
+  #image-1 {
+    background-image: linear-gradient(60deg, rgba(28, 23, 33, 1) 30%, rgba(28, 23, 33, .05)),
+                      url("https://ayizan.blob.core.windows.net/site-images/Designer at Desk.jpeg");
+  }
+}

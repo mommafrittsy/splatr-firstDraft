@@ -1,0 +1,91 @@
+<section class="inactive" id="transactions">
+  <% if(user.transactions.length > 0) { %>
+  <article class="block card" id="trans-search">
+    <h2 class="block-name">
+      <i class="far fa-chart-line fa-lg fa-fw"></i>
+      Transactions
+    </h2>
+    <div id="search-inputs">
+      <label for="search-box">Search</label>
+      <div class="input-group">
+        <span class="input-group-prepend">
+          <span class="input-group-text">
+            <i class="far fa-search fa-fw"></i>
+          </span>
+        </span>
+        <input type="text" class="form-control" id="search-box" placeholder="Search">
+      </div>
+      <label for="search-status">Status</label>
+      <div class="input-group">
+        <div class="input-group-prepend">
+          <span class="input-group-text"><i class="far fa-list-alt fa-fw"></i></span>
+        </div>
+        <select class="form-control custom-select" id="search-status">
+          <option class="status" value="" selected>Status</option>
+          <option class="status" value="request">Requested</option>
+          <option class="status" value="accept">Accepted</option>
+          <option class="status" value="declined">Declined</option>
+          <option class="status" value="deposit">Deposited</option>
+          <option class="status" value="preview">Preview Posted</option>
+          <option class="status" value="previewAccept">Preview Accepted</option>
+          <option class="status" value="paid">Final Payment Posted</option>
+          <option class="status" value="final">Final Posted</option>
+          <option class="status" value="closed">Closed</option>
+        </select>
+      </div>
+      <label for="search-range">Search by Date Range</label>
+      <div class="input-group">
+        <div class="input-group-prepend">
+          <span class="input-group-text"><i class="far fa-calendar-alt fa-fw"></i></span>
+        </div>
+        <input type="date" class="form-control calendar" id="date-start">
+      </div>
+      <div class="input-group">
+        <div class="input-group-prepend">
+          <span class="input-group-text"><i class="far fa-calendar-alt fa-fw"></i></span>
+        </div>
+        <input type="date" class="form-control calendar" id="date-end">
+      </div>
+    </div>
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>Client</th>
+          <th>Comm Type</th>
+          <th>Status</th>
+          <th>Last Activity</th>
+        </tr>
+      </thead>
+      <tbody id="search-results">
+        <% user.transactions.sort((a,b)=>{ %>
+          <% return b.activity - a.activity; %>
+        <% });%>
+        <% for(let trans of user.transactions){ %>
+        <tr>
+          <td>
+            <a href="/<%=trans.client.username%>"><%=trans.client.username%></a>
+          </td>
+          <td>
+            <a href="/transaction/<%=trans._id%>"><%=trans.type.name%></a>
+          </td>
+          <td>
+            <a href="/transaction/<%=trans._id%>">
+              <% if(trans.status != 'previewAccept'){ %>
+              <%=trans.status.substring(0,1).toUpperCase()%><%=trans.status.substring(1)%>
+              <% } else { %>
+              Preview Accepted
+              <% } %>
+            </a>
+          </td>
+          <td>
+            <a href="/transaction/<%=trans._id%>">
+              <%=datify(trans.dates.activity, 'US')%>
+            </a>
+          </td>
+        </tr>
+        <% } %>
+      </tbody>
+    </table>
+  </article>
+  <% } %>
+</section>

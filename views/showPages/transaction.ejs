@@ -1,0 +1,391 @@
+<% include ../partials/header %>
+<main>
+  <input type="hidden" id="trans-id" value="<%=trans._id%>">
+  <input type="hidden" id="level" value="<%=currentUser.level%>">
+  <section id="transaction-block">
+    <header>
+      <h1>
+        <a href="/<%=trans.client.username%>"><%=trans.client.username%></a>
+        <span id="amper">&</span>
+        <a href="/<%=trans.artist.username%>"><%=trans.artist.username%></a>
+      </h1>
+      <h2><%=trans.type.name%></h2>
+      <div id="btn-group">
+        <% if(trans.artist.id == currentUser._id.toString() && !trans.dates.accept && !trans.dates.declined){ %>
+        <button type="button" class="btn btn-primary btn-block action-btn" data-id="accept">Accept</button>
+        <button type="button" class="btn btn-danger btn-block action-btn" data-id="decline">Decline</button>
+        <% } %>
+        <% if(trans.client.id == currentUser._id.toString()){ %>
+          <% if(trans.dates.accept && !trans.dates.deposit){ %>
+        <a href="/transaction/<%=trans._id%>/deposit" class="btn btn-primary btn-block">Place Deposit</a>
+          <% } else if(trans.dates.preview && !trans.dates.previewAccept){ %>
+        <button type="button" class="btn btn-primary btn-block action-btn" data-id="preview_accept">Accept Preview</button>
+          <% } else if(trans.dates.final && !trans.dates.paid){ %>
+        <a href="/transaction/<%=trans._id%>/payment" class="btn btn-primary btn-block">Complete Payment</a>
+          <% } %>
+        <% } %>
+        <% if(trans.dates.accept && !trans.dates.review){ %>
+        <button type="button" class="btn btn-danger btn-block action-btn" data-id="dispute">Dispute Transaction</button>
+        <% } %>
+      </div>
+    </header>
+    <% if(trans.disputed == true){ %>
+    <div id="dispute-alert">This Transaction is Under Dispute</div>
+    <% } %>
+    <div class="inactive" id="alert-box"></div>
+    <div class="meter inactive" id="upload-meter">
+      <span><span></span></span>
+    </div>
+    <% if(!trans.final){ %>
+      <%if(trans.type.mediaType == 'image'){ %>
+    <img id="example" src="<%=trans.type.example%>">
+      <% } else if(trans.type.mediaType == 'video'){ %>
+    <video id="example" src="<%=trans.type.example%>" controls></video>
+      <% } else if(trans.type.mediaType == 'audio'){ %>
+    <div id="example">
+        <i class="far fa-volume fa-10x"></i>
+        <audio id="example" src="<%=trans.type.example%>" controls></audio> 
+      </div>
+      <% } %>
+    <% } else { %>
+    <div id="finals-block">
+      <% if(!trans.dates.paid){ %>
+        <% for (let file of trans.final.image){ %>
+          <%if(file.mediaType == 'video'){ %>
+        <div class="final video">
+          <video src="<%=file.url%>" controls></video>
+          <% } else { %>
+        <div class="final">
+            <%if(file.public_url && !trans.dates.paid){ %>
+          <img src="<%=file.public_url%>">
+            <% } else { %>
+              <% if(file.mediaType == 'audio'){ %>
+          <audio src="<%=file.url%>" controls></audio>
+              <% } else if(file.mediaType == 'image'){ %>
+                <% if(!trans.dates.paid && file.public){ %>
+          <img src="<%=file.public%>">
+                <% } else { %>
+          <img src="<%=file.url%>">    
+                <% } %>
+              <% } else { %>
+          <i class="far fa-file fa-3x text-success"></i>
+              <% } %>
+            <% } %>
+          <% } %>
+          <p class="filename"><%=file.originalName%></p>
+        </div>
+        <% } %>
+      <% } else { %>
+        <% for (let file of trans.final.image){ %>
+          <% if(file.mediaType == 'video'){ %>
+      <div class="final video">
+        <video src="<%=file.url%>" controls></video>
+          <% } else { %>
+      <div class="final">
+            <% if(file.mediaType == 'audio'){ %>
+        <audio src="<%=file.url%>" controls></audio>
+            <% } else if(file.mediaType == 'image'){ %>
+        <img src="<%=file.url%>">    
+            <% } else { %>
+        <i class="far fa-file fa-3x text-success"></i>
+            <% } %>
+          <% } %>
+        <a href="/gallery/<%=trans.artist.username%>/<%=trans.final._id%>" class="filename"><%=file.originalName%></a>
+        <a href="<%=file.url%>" download class="btn btn-sm btn-primary">Download</a>
+      </div>
+        <% } %>
+      <% } %>
+    </div>
+    <% } %>
+    <table>
+      <thead>
+        <tr>
+          <th>Activity</th>
+          <th>Date</th>
+        </tr>
+      </thead>
+      <tbody class="text-center text-md-left">
+        <tr>
+          <td>Requested:</td>
+          <td class="pl-3">
+            <i class="fas fa-check-circle fa-lg"></i>
+            <%=datify(trans.dates.request,'US')%>
+          </td>
+        </tr>
+        <% if(trans.status == 'declined'){ %>
+        <tr>
+          <td>Declined:</td>
+          <td class="pl-3">
+            <% if(trans.dates.declined){ %>
+            <i class="fas fa-check-circle fa-lg"></i>
+            <%=datify(trans.dates.declined,'US')%>
+            <% } %>
+          </td>
+        </tr>
+        <% } %>
+        <% if(trans.status != 'declined'){ %>
+        <tr>
+          <td>Accepted:</td>
+          <td class="pl-3">
+            <% if(trans.dates.accept){ %>
+            <i class="fas fa-check-circle fa-lg"></i>
+            <%=datify(trans.dates.accept,'US')%>
+            <% } %>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <%if(trans.dates.deposit && trans.client.id == currentUser._id.toString()){%>
+            <a href="/transaction/<%=trans._id%>/deposit" class="text-info">
+            <% } %>
+            Deposit:
+            <%if(trans.dates.deposit && trans.client.id == currentUser._id.toString()){%>
+            </a>
+            <% } %>
+          </td>
+          <td class="pl-3">
+            <% if(trans.dates.deposit){ %>
+            <i class="fas fa-check-circle fa-lg"></i>
+            <%if(trans.client.id == currentUser._id.toString()){ %>
+            <a href="/transaction/<%=trans._id%>/deposit" class="text-info">
+            <% } %>
+              <%=datify(trans.dates.deposit,'US')%>
+            <%if(trans.client.id == currentUser._id.toString()){ %>
+            </a>
+            <% } %>
+            <% } %>
+          </td>
+        </tr>
+        <tr>
+          <td>Preview:</td>
+          <td class="text-left pl-3">
+            <% if(trans.dates.preview){ %>
+            <i class="fas fa-check-circle fa-lg"></i>
+            <%=datify(trans.dates.preview,'US')%>
+          </td>
+          <% } %>
+        </tr>
+        <tr>
+          <td>Preview Accepted:</td>
+          <td class="text-left pl-3">
+            <% if(trans.dates.previewAccept){ %>
+            <i class="fas fa-check-circle fa-lg"></i>
+            <%=datify(trans.dates.previewAccept,'US')%>
+          </td>
+          <% } %>
+        </tr>
+        <tr>
+          <td>Completed:</td>
+          <td class="text-left pl-3">
+            <% if(trans.dates.final){ %>
+            <i class="fas fa-check-circle fa-lg"></i>
+            <%=datify(trans.dates.final,'US')%>
+          </td>
+          <% } %>
+        </tr>
+        <tr>
+          <td>
+            <% if(trans.dates.paid && trans.client.id == currentUser._id.toString()){ %>
+            <a href="/transaction/<%=trans._id%>/payment" class="text-info">
+            <% } %>
+            Paid:
+            <% if(trans.dates.paid && trans.client.id == currentUser._id.toString()){ %>
+            </a>
+            <% } %>
+          </td>
+          <td class="text-left pl-3">
+            <% if(trans.dates.paid){ %>
+            <i class="fas fa-check-circle fa-lg"></i>
+            <% if(trans.client.id == currentUser._id.toString()){ %>
+            <a href="/transaction/<%=trans._id%>/payment" class="text-info">
+            <% } %>
+            <%=datify(trans.dates.paid,'US')%>
+            <% if(trans.client.id == currentUser._id.toString()){ %>
+            </a>
+            <% } %>
+            <% } %>
+          </td>
+        </tr>
+        <tr>
+          <td>Review:</td>
+          <td class="text-left pl-3">
+            <% if(trans.dates.review){ %>
+            <i class="fas fa-check-circle fa-lg"></i>
+            <%=datify(trans.dates.review,'US')%>
+          </td>
+          <% } %>
+        </tr>
+        <% } %>
+      </tbody>
+    </table>
+    <div id="info-blocks">
+      <h3>Request:</h3>
+      <p><%=trans.request%></p>
+      <% if(currentUser._id == trans.client.id && !trans.dates.paid && !trans.dates.declined){ %>
+      <button type="button" class="upload-show px-0"><h3>References:<i class="far fa-chevron-up ml-3"></i></h3></button>
+      <div class="comm-upload">
+        <i class="far fa-plus fa-2x"></i>
+        <p>Drop Files Here</p>
+        <label for="ref-upload" class="btn btn-simple btn-success btn-sm">Upload</label>
+        <input type="file" class="upload-files" multiple>
+        <p class="inactive">Uploading File<span class="file-index"></span> of <span class="file-total"></span></p>
+        <div class="meter inactive">
+          <span>Processing Upload<span></span></span>
+        </div>
+        <div class="preview-box"></div>
+        <button type="button" class="submit-upload inactive btn btn-simple btn-success btn-sm" data-name="references">Submit Files</button>
+      </div>
+      <% } else { %>
+      <h3 class="info-header">References:</h3>
+      <% } %>
+      <div class="image-holder">
+        <% for (let ref of trans.reference){ %>
+          <% if(ref.mediaType == 'image'){ %>
+          <button type="button" class="grid-image" data-toggle="modal" data-target="#playerModal" data-type="img" data-url="<%=ref.url%>">
+            <img src="<%=ref.url%>">
+          </button>
+          <% } else if(ref.mediaType == 'video'){ %>
+          <button type="button" class="grid-image" data-toggle="modal" data-target="#playerModal" data-type="video" data-url="<%=ref.url%>">
+            <video class="grid-image" src="<%=ref.url%>"></video>
+          </button>
+          <% } else if(ref.mediaType == 'audio'){ %>
+        <button type="button" class="grid-image" data-toggle="modal" data-target="#playerModal" data-type="audio" data-url="<%=ref.url%>">
+          <i class="far fa-volume fa-3x"></i>
+          <audio src="<%=ref.url%>"></audio> 
+        </button>  
+          <% } %>
+        <% } %>
+      </div>
+      <%if(currentUser._id == trans.artist.id && trans.dates.accept && !trans.dates.final){ %>
+      <button type="button" class="upload-show px-0"><h3>Previews:<i class="far fa-chevron-up ml-3"></i></h3></button>
+      <div class="comm-upload">
+        <i class="far fa-plus fa-2x"></i>
+        <p>Drop Files Here</p>
+        <label for="ref-upload" class="btn btn-simple btn-success btn-sm">Upload</label>
+        <input type="file" class="upload-files" multiple>
+        <p class="inactive">Uploading File<span class="file-index"></span> of <span class="file-total"></span></p>
+        <div class="meter inactive">
+          <span>Processing Upload<span></span></span>
+        </div>
+        <div class="preview-box"></div>
+        <button type="button" class="submit-upload inactive btn btn-simple btn-success btn-sm" data-name="preview">Submit Files</button>
+      </div>
+      <% } else if(trans.preview.length > 0){ %>
+      <h3 class="info-header">Previews:</h3>
+      <% } %>
+      <% if(trans.preview.length > 0){ %>
+      <div class="image-holder">
+        <% for (let file of trans.preview){ %>
+          <% if(file.mediaType == 'image'){ %>
+        <button type="button" class="grid-image" data-toggle="modal" data-target="#playerModal" data-type="img" data-url="<%=file.url%>">
+          <img src="<%=file.url%>">
+        </button>
+          <% } else if(file.mediaType == 'video'){ %>
+        <button type="button" class="grid-image" data-toggle="modal" data-target="#playerModal" data-type="video" data-url="<%=file.url%>">
+          <video class="grid-image" src="<%=file.url%>"></video>
+        </button>
+          <% } else if(file.mediaType == 'audio'){ %>
+        <button type="button" class="grid-image" data-toggle="modal" data-target="#playerModal" data-type="audio" data-url="<%=file.url%>">
+          <i class="far fa-volume fa-3x"></i>
+          <audio src="<%=file.url%>"></audio> 
+        </button>  
+          <% } %>
+        <% } %>
+      </div>
+      <% } %>
+      <% if(currentUser._id == trans.artist.id && trans.dates.previewAccept && !trans.dates.paid){ %>
+      <button type="button" class="upload-show px-0"><h3>Final:<i class="far fa-chevron-up ml-3"></i></h3></button>
+      <div class="comm-upload">
+        <i class="far fa-plus fa-2x"></i>
+        <p>Drop Files Here</p>
+        <label for="ref-upload" class="btn btn-simple btn-success btn-sm">Upload</label>
+        <input type="file" class="upload-files" multiple>
+        <p class="inactive">Uploading File<span class="file-index"></span> of <span class="file-total"></span></p>
+        <div class="meter inactive">
+          <span>Processing Upload<span></span></span>
+        </div>
+        <div class="preview-box"></div>
+        <div class="inactive" id="img-alter">
+          <p><small>These options only apply to the image files in your gallery. Your client will have access to the unaltered images.</small></p>
+          <div class="checkbox mr-3">
+            <input id="watermark" name="watermark" type="checkbox">
+            <label for="watermark">
+              Add Splatr Watermark
+            </label>
+          </div>
+          <div class="checkbox mr-3">
+            <input id="downscale" name="downscale" type="checkbox">
+            <label for="downscale">
+              Downscale Image
+            </label>
+          </div>
+        </div>
+        <button type="button" class="submit-upload inactive btn btn-simple btn-success btn-sm" data-name="final">Submit Files</button>
+      </div>
+      <% } %>
+    </div>
+    <% if(currentUser._id.toString() == trans.client.id && trans.dates.paid && !trans.review){ %>
+    <form id="review-form">
+      <h1>Review</h1>
+      <label for="rating" class="sr-only">Rating (Out of 100)</label>
+      <input type="number" min="1" max="100" class="form-control" id="rating" placeholder="Rating">
+      <p>/</p>
+      <p>100</p>
+      <label for="review" class="sr-only">Please leave a review for <%=trans.artist.username%>. You've got 150 characters.</label>
+      <textarea class="form-control" id="review" maxlength="150" placeholder="Please leave a review for <%=trans.artist.username%>. You've got 150 characters."></textarea>
+      <button type="submit" id="review-submit" class="btn btn-primary" data-id="<%=trans.id%>">Send Review</button>
+    </form>
+    <% } else if(trans.review) {%>
+    <div id="review-box">
+      <h1>Review</h1>
+      <p><%=trans.rating%>/100</p>
+      <p><%=trans.review%></p>
+    </div>
+    <% } %>
+    <div id="comments">
+      <% if(!trans.review && !trans.dates.closed && !trans.dates.declined){ %>
+      <div id="comment-input">
+        <img class="comment-image" src="<%=currentUser.profile.url%>" alt="Your profile Image">
+        <label for="comment-textarea" class="sr-only">Type your comment here.</label>
+        <textarea class="form-control" id="comment-textarea" placeholder="What would you like to say?"></textarea>
+        <button type="button" class="btn btn-primary btn-sm" id="comment-submit" data-id="<%=trans._id%>" data-img="<%=currentUser.profile.url%>"><i class="far fa-paper-plane mr-3"></i> Send Comment</button>
+      </div>
+      <% } %>
+      <% for(let comment of trans.comments){ %>
+        <% if(comment.from._id.toString() == currentUser._id.toString()){ %>
+      <div class="comment right">
+        <img class="profile-img" src="<%=comment.from.profile.url%>" alt="<%=comment.from.username%>">
+        <p class="comment-username comment-child"><%=comment.from.username%> | <span class="comment-date"><%=datify(comment.date)%></span></p>
+        <p class="comment-text comment-child"><%=comment.content%></p>
+        <button type="button" class="btn btn-link mr-auto text-danger p-0 report-btn comment-child">Report</button>
+      </div>
+        <% } else { %>
+      <div class="comment left">
+        <img class="profile-img" src="<%=comment.from.profile.url%>" alt="<%=comment.from.username%>">
+        <p class="comment-username comment-child"><%=comment.from.username%> | <span class="comment-date"><%=datify(comment.date)%></span></p>
+        <p class="comment-text comment-child"><%=comment.content%></p>
+        <button type="button" class="btn btn-link ml-auto text-danger report-btn comment-child">Report</button>
+      </div>  
+        <% } %>
+      <% } %>
+    </div>
+  </section>
+</main>
+<div class="modal fade" id="playerModal" tabindex="-1" role="dialog" aria-labelledby="playerModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="playerModalLabel">View File</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body" id="player-body">
+        <video class="inactive" controls id="modal-video"></video>
+        <audio class="inactive" controls id="modal-audio"></audio>
+        <img class="inactive" id="modal-img">
+      </div>
+    </div>
+  </div>
+</div>
+<% include ../partials/footer %>

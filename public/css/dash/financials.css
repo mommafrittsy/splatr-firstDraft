@@ -1,0 +1,83 @@
+.account {
+  margin: 15px 0;
+}
+.account.default {
+  font-size: 14pt;
+}
+.amount {
+  font-size: 26pt;
+  margin: 15px 0;
+}
+#financials {
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: repeat(2, auto);
+}
+#payouts {
+  display: grid;
+  grid-row: 2;
+  grid-row-gap: 15px;
+  grid-template-columns: 1fr;
+  grid-template-rows: repeat(3, auto);
+  margin: 0 auto;
+  width: 300px;
+}
+#payout-receipt > h2 {
+  background-color: #7402c6;
+  color: #fff;
+  font-size: 18pt;
+  padding: 15px;
+  text-align: center;
+}
+#payout-receipt > p:first-of-type {
+  border-bottom: 1px solid #efefef;
+}
+#payout-receipt > p:nth-of-type(2) {
+  margin: 15px 0;
+}
+#payout-receipt > p:last-of-type {
+  border-top: 1px solid #efefef;
+}
+#saved-cards p {
+  margin: 15px 0;
+}
+#small-blocks {
+  display: grid;
+  grid-column-gap: 15px;
+  grid-row-gap: 15px;
+  grid-template-columns: 1fr;
+  grid-template-rows: repeat(4, auto);
+}
+#small-blocks > .block {
+  justify-self: center;
+  margin: 15px;
+  width: 300px;
+}
+#submit-request[disabled = "true"]{
+  cursor: not-allowed;
+}
+@media (min-width: 800px){
+  #payouts {
+    align-items: center;
+    grid-column-gap: 15px;
+    grid-row-gap: 0px;
+    grid-template-columns: 300px 500px;
+    grid-template-rows: repeat(2, auto);
+    width: 850px;
+  }
+  #payouts > .block-name {
+    grid-column: 1/3;
+    grid-row: 1;
+    height: 42px;
+  }
+  #small-blocks {
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto auto;
+  }
+}
+@media (min-width: 1400px){
+  #small-blocks {
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: auto;
+  }
+}

@@ -1,0 +1,40 @@
+<section id="commissions" class="inactive">
+  <div class="modal fade" id="delete-comm-modal" tabindex="-1" role="dialog" aria-labelledby="delete-comm-modal-label" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="delete-comm-modal-label">Delete <span class="delete-comm-name"></span></h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true"><i class="far fa-times"></i></span>
+            </button>
+          </div>
+          <div class="modal-body">
+            Are you sure you want to delete <span class="delete-comm-name"></span>?
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-danger ml-auto" id="delete-comm-button">Delete Commission</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  <% for(let commission of user.commissions){ %>
+  <article class="block commission nsfw-<%=commission.NSFW%>">
+    <div class="commission-image" style="background-image:url('<%=commission.example.url%>')"></div>
+    <h1 class="name"><%=commission.name%></h1>
+    <h2>$<%=(commission.price/100).toFixed(0)%></h2>
+    <% if(commission.available){ %>
+    <p>Number Available: <%=commission.available%></p> 
+    <% } %>
+    <p class="description"><%=commission.description%></p>
+    <div>
+      <% for(let tag of commission.tags){ %>
+        <% if(tag.length > 1){ %>
+      <span class="badge tag">#<%=tag%></span>
+        <% } %>
+      <% } %>
+    </div>
+    <button type="button" class="btn btn-primary edit-button" data-id="<%=commission._id%>" data-image="<%=commission.example.url%>" data-name="<%=commission.name%>" data-price="<%=`${(commission.price/100).toFixed(0)}`%>" data-available="<%=commission.available%>" data-description="<%=commission.description%>" data-type="<%=commission.type%>" data-nsfw="<%=commission.NSFW%>" data-tags="<%=commission.tags.join("#")%>">Edit</button>
+    <button type="button" class="btn btn-danger delete-button" data-id="<%=commission._id%>" data-name="<%=commission.name%>">Delete</button>
+  </article>
+  <% } %>
+</section>

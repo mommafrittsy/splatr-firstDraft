@@ -1,0 +1,25 @@
+a {
+  color: white;
+}
+body {
+  width: 100vw;
+  height: 100vh;
+  z-index: -1000;
+  margin: 0;
+  padding: 0;
+  background-size: cover;
+  background-position: 50% 50%;
+  background-repeat: no-repeat;
+  background-color: #111;
+  background-image: linear-gradient(to bottom, rgba(15, 32, 39, .5), rgba(32, 58, 67,.5), rgba(44, 83, 100,.5)),
+                    url("https://ayizan.blob.core.windows.net/site-images/reset.jpg");
+}
+.card{
+  border-radius:.5rem;
+}
+@media (min-width: 800px){
+  footer {
+    position: fixed;
+    bottom: 0;
+  }
+}

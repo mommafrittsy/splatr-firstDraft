@@ -1,0 +1,97 @@
+<% include partials/header %>
+<%if(query){ %>
+<input type='hidden' value="<%=query%>" id="query">
+<% } %>
+  <div class="row">
+    <div class="col-lg-2 d-none d-lg-block p-0" id="filter-row">
+      <ul class="filters px-0">
+        <li class="pl-5 filter-header">
+          <h4 class="text-primary m-0">
+            Find by Artist
+          </h4>
+        </li>
+        <li class="pl-5" id="new-artists" data-filter="reviews < 10">
+          New <strong>&</strong> Excited
+        </li>
+        <li class="pl-5" id="high-rated-artists" data-filter="rating > 85">
+          Up <strong>&</strong> Coming
+        </li>
+        <li class="pl-5" id="many-review-artists" data-filter="reviews > 50">
+          Loved <strong>&</strong> Practiced
+        </li>
+        <li class="pl-5 filter-header">
+          <h4 class="text-primary m-0">
+              Find by Price
+          </h4>
+        </li>
+        <li class="pl-5" id="price-low" data-filter="price < 25">
+          <i class="fas fa-dollar-sign text-success"></i>
+          (< $25)
+        </li>
+        <li class="pl-5" id="price-average" data-filter="price: 25 TO 100">
+          <i class="fas fa-dollar-sign text-success"></i><i class="fas fa-dollar-sign text-success"></i>
+          ($25 - $100)
+        </li>
+        <li class="pl-5" id="price-high" data-filter="price > 100">
+          <i class="fas fa-dollar-sign text-success"></i><i class="fas fa-dollar-sign text-success"></i><i class="fas fa-dollar-sign text-success"></i>
+          (> $100)
+        </li>
+        <li class="pl-5 filter-header">
+          <h4 class="text-primary m-0">
+              Find by Type
+          </h4>
+        </li>
+        <!--<li class="pl-5" id="animation" data-filter="type:animation">-->
+        <!--  Animation-->
+        <!--</li>-->
+        <li class="pl-5" id="comic" data-filter="type:comic">
+          Comics
+        </li>
+        <li class="pl-5" id="craft" data-filter="type:craft">
+          Crafts
+        </li>
+        <li class="pl-5" id="digital" data-filter="type:digital">
+          Digital Art
+        </li>
+        <!--<li class="pl-5" id="fiction" data-filter="type:fiction">-->
+        <!--  Fiction-->
+        <!--</li>-->
+        <!--<li class="pl-5" id="film" data-filter="type:film">-->
+        <!--  Film-->
+        <!--</li>-->
+        <!--<li class="pl-5" id="non-fiction" data-filter="type:non-fiction">-->
+        <!--  Non-Fiction-->
+        <!--</li>-->
+        <li class="pl-5" id="photo" data-filter="type:photo">
+          Photos
+        </li>
+        <!--<li class="pl-5" id="poetry" data-filter="type:poetry">-->
+        <!--  Poetry-->
+        <!--</li>-->
+        <li class="pl-5" id="traditional" data-filter="type:traditional">
+          Traditional Art
+        </li>
+      </ul>
+    </div>
+    <div class="col-12 col-lg-10 pt-3">
+      <div class="row justify-content-center mb-5">
+        <div class="col-10 col-lg-8 align-self-center">
+          <div class="form-group">
+            <label for="artSearch" class="sr-only">Search for artists, commisisons and art here.</label>
+            <div class="input-group">
+              <div class="input-group-prepend" id="search-icon">
+                <span class="input-group-text">
+                  <i class="fas fa-search fa-4x mx-3"></i>
+                </span>
+              </div>
+              <input type="text" name="artSearch" placeholder="Search Here" class="form-control" id="art-search" data-nsfw="<%=NSFW%>">
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row align-items-top p-5 text-center" id='results-row'>
+        
+      </div>
+    </div>
+  </div>
+<% include partials/footer %>
